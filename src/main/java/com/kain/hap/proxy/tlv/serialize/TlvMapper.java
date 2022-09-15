@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TlvMapper {
 	private final TypeSerializer typeSerializer = new TypeSerializer();
+	private final TypeDeserializer typeDesrializer = new TypeDeserializer();
 	
 	public <T> byte[] writeValue(T value) {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -28,7 +29,7 @@ public class TlvMapper {
 	}
 	
 	public <T> T readPacket(byte[] data) {
-		return null;
+		return typeDesrializer.writeToObject(data);
 	}
 
 }

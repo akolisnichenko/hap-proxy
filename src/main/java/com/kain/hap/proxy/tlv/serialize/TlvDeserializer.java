@@ -20,9 +20,7 @@ public class TlvDeserializer implements Deserializer<Object>{
 	
 	@Override
 	public Object deserialize(InputStream inputStream) throws IOException {
-		//inputStream.
-		
-		return mapper.writeValue(null);
+		return mapper.readPacket(inputStream.readAllBytes());
 	}
 
 }

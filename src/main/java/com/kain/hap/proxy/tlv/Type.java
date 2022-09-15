@@ -1,5 +1,10 @@
 package com.kain.hap.proxy.tlv;
 
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -25,5 +30,11 @@ public enum Type {
 	
 
 	private final byte value; 
+	
+    private static final Map<Byte, Type> mappedValues = Stream.of(values()).collect(Collectors.toMap(Type::getValue, Function.identity() , (s1,s2) -> s1));
+	
+	public static Type toType(byte value) {
+		return mappedValues.get(value);
+	}
 	
 }
