@@ -4,9 +4,11 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class HapResponse {
 	private String code;
 	private Map<String, String> headers = Maps.newHashMap();
