@@ -4,18 +4,18 @@ import org.springframework.integration.handler.GenericHandler;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
 
-import com.kain.hap.proxy.tlv.packet.BasePacket;
+import com.kain.hap.proxy.tlv.packet.HapRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class PacketHandler implements GenericHandler<BasePacket>{
+public class PacketHandler implements GenericHandler<HapRequest>{
 
 	@Override
-	public Object handle(BasePacket payload, MessageHeaders headers) {
+	public Object handle(HapRequest payload, MessageHeaders headers) {
 		log.debug("Here is packet: {}", payload);
-		return payload;
+		return payload.getBody();
 	}
 
 }

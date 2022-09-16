@@ -13,16 +13,14 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
 import com.kain.hap.proxy.tlv.integration.PacketHandler;
-import com.kain.hap.proxy.tlv.integration.PacketTransformer;
-import com.kain.hap.proxy.tlv.serialize.PacketSerializer;
+import com.kain.hap.proxy.tlv.serialize.HttpPacketSerializer;
 import com.kain.hap.proxy.tlv.serialize.TlvSerializer;
 
 @Configuration
 public class ServerConfig {
 	@Autowired
 	private PacketHandler packetHandler;
-	@Autowired
-	private PacketTransformer packetTransformer;
+
 	
 	@Bean
 	public MessageChannel errorChannel() {
@@ -37,16 +35,12 @@ public class ServerConfig {
 	@Bean
 	public IntegrationFlow server() {
 	    return IntegrationFlows.from(Tcp.inboundGateway(Tcp.netServer(12345)
-	                            //.deserializer(new TlvDeserializer())
-	    						//.deserializer(TcpCodecs.crlf())
-	    						.deserializer(new PacketSerializer())
+	    						.deserializer(new HttpPacketSerializer())
 	                            .serializer(new TlvSerializer())
 	                            .backlog(30)
 	                            )
 	                        .errorChannel(errorChannel())
-	                        .replyTimeout(0)
 	                        .id("tcpIn"))
-	    		.transform(packetTransformer)
 	            .channel(income())
 	            .get();
 	}
