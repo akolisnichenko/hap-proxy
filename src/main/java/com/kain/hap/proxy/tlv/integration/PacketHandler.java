@@ -15,7 +15,7 @@ public class PacketHandler implements GenericHandler<HapRequest>{
 	@Override
 	public Object handle(HapRequest payload, MessageHeaders headers) {
 		log.debug("Here is packet: {}", payload);
-		return payload.getBody();
+		return payload;
 	}
 
 }
