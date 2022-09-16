@@ -1,14 +1,17 @@
 package com.kain.hap.proxy.tlv.serialize;
 
 import java.io.ByteArrayOutputStream;
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class TlvMapper {
+	
 	private final TypeSerializer typeSerializer = new TypeSerializer();
 	private final TypeDeserializer typeDesrializer = new TypeDeserializer();
+	
+	public static final TlvMapper INSTANCE = new TlvMapper();
 	
 	public <T> byte[] writeValue(T value) {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -17,13 +20,17 @@ public class TlvMapper {
 	}
 	
 	private void addData(Class<? extends Object> clazz, Object value, ByteArrayOutputStream stream) {
-		addData(clazz.getSuperclass(), value, stream);
-		for (Field f : clazz.getDeclaredFields()) {
+		if (clazz.getSuperclass() != null) {
+			addData(clazz.getSuperclass(), value, stream);
+		}
+		for (Method m : clazz.getDeclaredMethods()) {
 			try {
-				stream.write(typeSerializer.serialize(f.get(value)));
+				if (m.canAccess(value) && m.getName().startsWith("get")) {
+					stream.write(typeSerializer.serialize(m.invoke(value)));
+				}
 			}
 			catch(Exception ex) {
-				log.error("Not available property {}", f.getName(), ex);
+				log.error("Not available method {}", m.getName(), ex);
 			}
 		}
 	}

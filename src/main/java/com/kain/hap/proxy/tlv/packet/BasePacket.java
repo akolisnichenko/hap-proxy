@@ -9,9 +9,4 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public abstract class BasePacket {
 	private final State state;
-	
-
-	public String toString() {
-		return null;
-	}
 }
