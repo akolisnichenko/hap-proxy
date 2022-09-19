@@ -4,6 +4,6 @@ import com.kain.hap.proxy.tlv.packet.BasePacket;
 
 public interface StateService {
 	
-	BasePacket onNext(BasePacket incomePacket);
+	BasePacket onNext(StateContext incomePacket);
 
 }

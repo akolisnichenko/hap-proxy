@@ -9,6 +9,7 @@ import lombok.Data;
 @Builder
 @Data
 public class StateContext {
+	private String deviceId;
 	private State state; 
 
 }

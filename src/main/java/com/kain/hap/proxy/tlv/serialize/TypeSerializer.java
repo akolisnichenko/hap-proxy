@@ -8,6 +8,7 @@ import com.kain.hap.proxy.tlv.Method;
 import com.kain.hap.proxy.tlv.State;
 import com.kain.hap.proxy.tlv.Type;
 import com.kain.hap.proxy.tools.Salt;
+import com.kain.hap.proxy.tools.SrpPublicKey;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,8 +38,10 @@ public class TypeSerializer {
 		register(new SaltSerilizer());
 		register(new StateSerilizer());
 		register(new MethodSerilizer());
+		register(new KeySerilizer());
 	}
-
+//TODO: add long byte array implementation 
+	
 	class SaltSerilizer implements GenericSerializer<Salt> {
 		@Override
 		public byte[] serialize(Salt salt) {
@@ -52,6 +55,22 @@ public class TypeSerializer {
 		@Override
 		public Class<Salt> getTypeClass() {
 			return Salt.class;
+		}
+	}
+	
+	class KeySerilizer implements GenericSerializer<SrpPublicKey> {
+		@Override
+		public byte[] serialize(SrpPublicKey key) {
+			ByteBuffer buf = ByteBuffer.allocate(key.getKey().length + 2);
+			buf.put(Type.PUBLIC_KEY.getValue());
+			buf.put((byte) key.getKey().length);
+			buf.put(key.getKey());
+			return buf.array();
+		}
+
+		@Override
+		public Class<SrpPublicKey> getTypeClass() {
+			return SrpPublicKey.class;
 		}
 	}
 

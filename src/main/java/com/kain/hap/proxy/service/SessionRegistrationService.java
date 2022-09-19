@@ -4,7 +4,12 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class SessionRegistrationService {
+	public static final SessionRegistrationService INSTANCE = new SessionRegistrationService();
+	
 	private Map<String, DeviceSession> sessions = Maps.newConcurrentMap();
 	
 	public DeviceSession registerSession(String deviceId) {

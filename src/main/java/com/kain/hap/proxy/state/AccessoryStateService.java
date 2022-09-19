@@ -1,9 +1,12 @@
 package com.kain.hap.proxy.state;
 
+import org.springframework.stereotype.Component;
+
 import com.kain.hap.proxy.tlv.packet.BasePacket;
 
 import lombok.RequiredArgsConstructor;
 
+@Component
 @RequiredArgsConstructor
 public class AccessoryStateService implements StateService{
 	
@@ -11,11 +14,8 @@ public class AccessoryStateService implements StateService{
 	
 
 	@Override
-	public BasePacket onNext(BasePacket income) {
-		// TODO: wrap into context
-		
-		return map.getNextStep(income.getState()).handle(null);
-		
+	public BasePacket onNext(StateContext context) {
+		return map.getNextStep(context.getState()).handle(context);
 	}
 
 }

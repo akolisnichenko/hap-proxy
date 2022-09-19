@@ -15,13 +15,12 @@ import org.springframework.messaging.MessageHandler;
 import com.kain.hap.proxy.tlv.integration.PacketHandler;
 import com.kain.hap.proxy.tlv.serialize.BasePacketSerializer;
 import com.kain.hap.proxy.tlv.serialize.HttpPacketDeserializer;
-import com.kain.hap.proxy.tlv.serialize.HttpPacketSerializer;
 
 @Configuration
 public class ServerConfig {
 	@Autowired
 	private PacketHandler packetHandler;
-
+	
 	@Bean
 	public MessageChannel errorChannel() {
 		return MessageChannels.direct().get();
