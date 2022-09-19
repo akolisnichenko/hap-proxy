@@ -40,16 +40,11 @@ public class TypeSerializer {
 		register(new MethodSerilizer());
 		register(new KeySerilizer());
 	}
-//TODO: add long byte array implementation 
 	
-	class SaltSerilizer implements GenericSerializer<Salt> {
+	class SaltSerilizer extends GenericSerializer<Salt> {
 		@Override
 		public byte[] serialize(Salt salt) {
-			ByteBuffer buf = ByteBuffer.allocate(salt.getSalt().length + 2);
-			buf.put(Type.SALT.getValue());
-			buf.put((byte) salt.getSalt().length);
-			buf.put(salt.getSalt());
-			return buf.array();
+			return writeTLV(Type.SALT.getValue(), salt.getSalt());
 		}
 
 		@Override
@@ -58,14 +53,10 @@ public class TypeSerializer {
 		}
 	}
 	
-	class KeySerilizer implements GenericSerializer<SrpPublicKey> {
+	class KeySerilizer extends GenericSerializer<SrpPublicKey> {
 		@Override
 		public byte[] serialize(SrpPublicKey key) {
-			ByteBuffer buf = ByteBuffer.allocate(key.getKey().length + 2);
-			buf.put(Type.PUBLIC_KEY.getValue());
-			buf.put((byte) key.getKey().length);
-			buf.put(key.getKey());
-			return buf.array();
+			return writeTLV(Type.PUBLIC_KEY.getValue(), key.getKey());
 		}
 
 		@Override
@@ -74,13 +65,9 @@ public class TypeSerializer {
 		}
 	}
 
-	class StateSerilizer implements GenericSerializer<State> {
+	class StateSerilizer extends GenericSerializer<State> {
 		public byte[] serialize(State state) {
-			ByteBuffer buf = ByteBuffer.allocate(3);
-			buf.put(Type.STATE.getValue());
-			buf.put((byte) 0x01);
-			buf.put(state.getValue());
-			return buf.array();
+			return writeTLV(Type.STATE.getValue(), new byte[] {state.getValue()}) ;
 		}
 
 		@Override
@@ -89,13 +76,9 @@ public class TypeSerializer {
 		}
 	}
 
-	class MethodSerilizer implements GenericSerializer<Method> {
+	class MethodSerilizer extends GenericSerializer<Method> {
 		public byte[] serialize(Method method) {
-			ByteBuffer buf = ByteBuffer.allocate(3);
-			buf.put(Type.METHOD.getValue());
-			buf.put((byte) 0x01);
-			buf.put(method.getValue());
-			return buf.array();
+			return writeTLV(Type.METHOD.getValue(), new byte[] {method.getValue()}) ;
 		}
 
 		@Override
@@ -103,4 +86,6 @@ public class TypeSerializer {
 			return Method.class;
 		}
 	}
+	
+	
 }

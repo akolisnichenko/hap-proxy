@@ -1,5 +1,7 @@
 package com.kain.hap.proxy.tlv.integration;
 
+import java.util.Optional;
+
 import org.springframework.integration.handler.GenericHandler;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
@@ -22,7 +24,9 @@ public class PacketHandler implements GenericHandler<HapRequest>{
 		log.debug("Here is packet: {}", payload);
 		StateContext context = StateContext.builder()
 				.state(payload.getBody().getState())
-				.deviceId(headers.get("id").toString())
+				.deviceId(Optional.ofNullable(headers.get("id"))
+						.map(Object::toString)
+						.orElse(null))
 				.build(); 
 		return stateService.onNext(context);
 
