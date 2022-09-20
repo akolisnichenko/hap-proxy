@@ -9,7 +9,7 @@ import com.kain.hap.proxy.tlv.Type;
 import com.kain.hap.proxy.tlv.packet.ErrorPacket;
 import com.kain.hap.proxy.tlv.packet.MethodPacket;
 import com.kain.hap.proxy.tlv.packet.ProofPacket;
-import com.kain.hap.proxy.tools.SrpPublicKey;
+import com.kain.hap.proxy.tlv.type.SrpPublicKey;
 
 public class TypeDeserializer {
 

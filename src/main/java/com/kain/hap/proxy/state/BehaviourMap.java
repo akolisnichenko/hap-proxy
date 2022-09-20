@@ -5,7 +5,6 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.kain.hap.proxy.state.setup.ErrorStep;
-import com.kain.hap.proxy.state.setup.InitialStep;
 import com.kain.hap.proxy.state.setup.SaltStep;
 import com.kain.hap.proxy.tlv.State;
 

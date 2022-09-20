@@ -1,14 +1,13 @@
 package com.kain.hap.proxy.tlv.serialize;
 
-import java.nio.ByteBuffer;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
 import com.kain.hap.proxy.tlv.Method;
 import com.kain.hap.proxy.tlv.State;
 import com.kain.hap.proxy.tlv.Type;
-import com.kain.hap.proxy.tools.Salt;
-import com.kain.hap.proxy.tools.SrpPublicKey;
+import com.kain.hap.proxy.tlv.type.Salt;
+import com.kain.hap.proxy.tlv.type.SrpPublicKey;
 
 import lombok.extern.slf4j.Slf4j;
 

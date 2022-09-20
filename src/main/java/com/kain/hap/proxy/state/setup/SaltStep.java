@@ -7,8 +7,8 @@ import com.kain.hap.proxy.state.StateContext;
 import com.kain.hap.proxy.tlv.State;
 import com.kain.hap.proxy.tlv.packet.BasePacket;
 import com.kain.hap.proxy.tlv.packet.SaltPacket;
-import com.kain.hap.proxy.tools.Salt;
-import com.kain.hap.proxy.tools.SrpPublicKey;
+import com.kain.hap.proxy.tlv.type.Salt;
+import com.kain.hap.proxy.tlv.type.SrpPublicKey;
 
 
 public class SaltStep implements BehaviourState {
