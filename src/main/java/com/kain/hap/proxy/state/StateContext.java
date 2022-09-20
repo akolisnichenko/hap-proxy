@@ -6,10 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 
 
+//TODO: context will be replaced after tune protocol
+
 @Builder
 @Data
 public class StateContext {
 	private String deviceId;
-	private State state; 
-
+	private State state;
 }

@@ -6,9 +6,11 @@ import com.kain.hap.proxy.tlv.ErrorCode;
 import com.kain.hap.proxy.tlv.Method;
 import com.kain.hap.proxy.tlv.State;
 import com.kain.hap.proxy.tlv.Type;
+import com.kain.hap.proxy.tlv.packet.DeviceProofPacket;
 import com.kain.hap.proxy.tlv.packet.ErrorPacket;
 import com.kain.hap.proxy.tlv.packet.MethodPacket;
 import com.kain.hap.proxy.tlv.packet.ProofPacket;
+import com.kain.hap.proxy.tlv.type.Proof;
 import com.kain.hap.proxy.tlv.type.SrpPublicKey;
 
 public class TypeDeserializer {
@@ -23,7 +25,7 @@ public class TypeDeserializer {
 		TlvWrapper wrapper = new TlvWrapper();
 		while (buf.hasRemaining()) {
 			byte type = buf.get();
-			byte length = buf.get();
+			int length = Byte.toUnsignedInt(buf.get());
 			
 			byte[] value = new byte[length]; 
 			buf.get(value);
@@ -35,12 +37,16 @@ public class TypeDeserializer {
 	}
 
 	private Object convertToObject(TlvWrapper wrapper) {
+		
+		if (wrapper.contains(Type.PUBLIC_KEY.getValue())) {
+			return new DeviceProofPacket(State.toState(wrapper.getOne(Type.STATE.getValue())),
+					new Proof(wrapper.get(Type.PROOF.getValue())),
+					new SrpPublicKey(wrapper.get(Type.PUBLIC_KEY.getValue())));
+		}
 		if (wrapper.contains(Type.PROOF.getValue())) {
 			return new ProofPacket(State.toState(wrapper.getOne(Type.STATE.getValue())),
-					new SrpPublicKey(wrapper.get(Type.PUBLIC_KEY.getValue())),
-					wrapper.get(Type.PROOF.getValue()));
+					new Proof(wrapper.get(Type.PROOF.getValue())));
 		}
-
 		if (wrapper.contains(Type.ERROR.getValue())) {
 			return new ErrorPacket(State.toState(wrapper.getOne(Type.STATE.getValue())),
 					ErrorCode.toError(wrapper.getOne(Type.ERROR.getValue())));

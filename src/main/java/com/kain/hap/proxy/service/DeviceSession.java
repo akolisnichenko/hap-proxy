@@ -7,7 +7,7 @@ import com.kain.hap.proxy.srp.Group;
 import lombok.Getter;
 
 //Client
-public class DeviceSession {
+public final class DeviceSession {
 	@Getter
 	private final byte[] salt;
 	private final byte[] privateKey; // a

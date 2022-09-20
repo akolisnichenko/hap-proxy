@@ -13,11 +13,14 @@ public class SessionRegistrationService {
 	private Map<String, DeviceSession> sessions = Maps.newConcurrentMap();
 	
 	public DeviceSession registerSession(String deviceId) {
-		return sessions.getOrDefault(deviceId, newSession());
+		DeviceSession session = new DeviceSession();
+		sessions.put(deviceId, session);
+		return session;
 	}
 
-	private DeviceSession newSession() {
-		return new DeviceSession();
+	//TODO: replace by error if not exist 
+	public DeviceSession getSession(String deviceId) {
+		return sessions.get(deviceId);
 	}
 
 }

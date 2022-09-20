@@ -1,6 +1,7 @@
 package com.kain.hap.proxy.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -18,6 +19,9 @@ import com.kain.hap.proxy.tlv.serialize.HttpPacketDeserializer;
 
 @Configuration
 public class ServerConfig {
+	@Value("${server.port:54321}")
+	private int accessoryPort;
+	
 	@Autowired
 	private PacketHandler packetHandler;
 	
@@ -40,7 +44,7 @@ public class ServerConfig {
 	public IntegrationFlow accessory() {
 		return IntegrationFlows
 				.from(Tcp
-						.inboundGateway(Tcp.netServer(12345)
+						.inboundGateway(Tcp.netServer(accessoryPort)
 								.deserializer(new HttpPacketDeserializer())
 								.serializer(new BasePacketSerializer())
 								.backlog(30))
@@ -49,6 +53,7 @@ public class ServerConfig {
 				.get();
 	}
 
+	
 	@Bean
 	public IntegrationFlow incomePacketHandler() {
 		return IntegrationFlows.from(income())
