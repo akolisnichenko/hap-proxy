@@ -1,11 +1,10 @@
-package com.kain.hap.proxy.tools;
+package com.kain.hap.proxy.tlv.type;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public class SrpPublicKey {
-	private final byte[] key;
-
+public class Proof {
+	private final byte[] proof;
 }

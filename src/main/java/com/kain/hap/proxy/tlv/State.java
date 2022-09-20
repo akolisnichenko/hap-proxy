@@ -14,7 +14,9 @@ public enum State {
 	M1((byte)0x01),
 	M2((byte)0x02),
 	M3((byte)0x03),
-	M4((byte)0x04);
+	M4((byte)0x04),
+	M5((byte)0x05),
+	M6((byte)0x06);
 	
 	private final byte value;
 	

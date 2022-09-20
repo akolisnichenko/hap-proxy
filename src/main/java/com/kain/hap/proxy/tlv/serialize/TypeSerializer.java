@@ -1,13 +1,14 @@
 package com.kain.hap.proxy.tlv.serialize;
 
-import java.nio.ByteBuffer;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
 import com.kain.hap.proxy.tlv.Method;
 import com.kain.hap.proxy.tlv.State;
 import com.kain.hap.proxy.tlv.Type;
-import com.kain.hap.proxy.tools.Salt;
+import com.kain.hap.proxy.tlv.type.Proof;
+import com.kain.hap.proxy.tlv.type.Salt;
+import com.kain.hap.proxy.tlv.type.SrpPublicKey;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,16 +38,14 @@ public class TypeSerializer {
 		register(new SaltSerilizer());
 		register(new StateSerilizer());
 		register(new MethodSerilizer());
+		register(new KeySerilizer());
+		register(new ProofSerilizer());
 	}
-
-	class SaltSerilizer implements GenericSerializer<Salt> {
+	
+	class SaltSerilizer extends GenericSerializer<Salt> {
 		@Override
 		public byte[] serialize(Salt salt) {
-			ByteBuffer buf = ByteBuffer.allocate(salt.getSalt().length + 2);
-			buf.put(Type.SALT.getValue());
-			buf.put((byte) salt.getSalt().length);
-			buf.put(salt.getSalt());
-			return buf.array();
+			return writeTLV(Type.SALT.getValue(), salt.getSalt());
 		}
 
 		@Override
@@ -54,14 +53,22 @@ public class TypeSerializer {
 			return Salt.class;
 		}
 	}
+	
+	class KeySerilizer extends GenericSerializer<SrpPublicKey> {
+		@Override
+		public byte[] serialize(SrpPublicKey key) {
+			return writeTLV(Type.PUBLIC_KEY.getValue(), key.getKey());
+		}
 
-	class StateSerilizer implements GenericSerializer<State> {
+		@Override
+		public Class<SrpPublicKey> getTypeClass() {
+			return SrpPublicKey.class;
+		}
+	}
+
+	class StateSerilizer extends GenericSerializer<State> {
 		public byte[] serialize(State state) {
-			ByteBuffer buf = ByteBuffer.allocate(3);
-			buf.put(Type.STATE.getValue());
-			buf.put((byte) 0x01);
-			buf.put(state.getValue());
-			return buf.array();
+			return writeTLV(Type.STATE.getValue(), new byte[] {state.getValue()}) ;
 		}
 
 		@Override
@@ -70,13 +77,9 @@ public class TypeSerializer {
 		}
 	}
 
-	class MethodSerilizer implements GenericSerializer<Method> {
+	class MethodSerilizer extends GenericSerializer<Method> {
 		public byte[] serialize(Method method) {
-			ByteBuffer buf = ByteBuffer.allocate(3);
-			buf.put(Type.METHOD.getValue());
-			buf.put((byte) 0x01);
-			buf.put(method.getValue());
-			return buf.array();
+			return writeTLV(Type.METHOD.getValue(), new byte[] {method.getValue()}) ;
 		}
 
 		@Override
@@ -84,4 +87,18 @@ public class TypeSerializer {
 			return Method.class;
 		}
 	}
+	
+	class ProofSerilizer extends GenericSerializer<Proof> {
+		public byte[] serialize(Proof proof) {
+			return writeTLV(Type.PROOF.getValue(), proof.getProof()) ;
+		}
+
+		@Override
+		public Class<Proof> getTypeClass() {
+			return Proof.class;
+		}
+	}
+	
+	
+	
 }

@@ -1,19 +1,18 @@
 package com.kain.hap.proxy.tlv.packet;
 
 import com.kain.hap.proxy.tlv.State;
-import com.kain.hap.proxy.tools.SrpPublicKey;
+import com.kain.hap.proxy.tlv.type.Proof;
 
 import lombok.Getter;
 
 @Getter
 public class ProofPacket extends BasePacket {
-	private final SrpPublicKey publicKey;
-	private final byte[] proof; //TODO: replace by Object
+
+	private final Proof proof;
 	
-	public ProofPacket(State state, SrpPublicKey key, byte[] proof) {
+	public ProofPacket(State state, Proof proof) {
 		super(state);
 		this.proof = proof;
-		this.publicKey = key;
 	}
 
 }
