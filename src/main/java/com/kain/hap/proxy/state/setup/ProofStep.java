@@ -1,22 +1,26 @@
 package com.kain.hap.proxy.state.setup;
 
-import com.kain.hap.proxy.service.DeviceSession;
+import com.kain.hap.proxy.service.AccessorySession;
 import com.kain.hap.proxy.service.SessionRegistrationService;
 import com.kain.hap.proxy.state.BehaviourState;
 import com.kain.hap.proxy.state.StateContext;
 import com.kain.hap.proxy.tlv.State;
 import com.kain.hap.proxy.tlv.packet.BasePacket;
+import com.kain.hap.proxy.tlv.packet.DeviceProofPacket;
 import com.kain.hap.proxy.tlv.packet.ProofPacket;
 import com.kain.hap.proxy.tlv.type.Proof;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class ProofStep implements BehaviourState {
-	private final SessionRegistrationService sessionService = SessionRegistrationService.INSTANCE;
+	private final SessionRegistrationService sessionService;
 
 	@Override
 	public BasePacket handle(StateContext context) {
-		DeviceSession session = sessionService.getSession(context.getDeviceId());
-		
-		// here will be proof 
-		return new ProofPacket(State.M4, new Proof(new byte[] {}));
+		AccessorySession session = sessionService.getSession(context.getDeviceId());
+		DeviceProofPacket income = (DeviceProofPacket)context.getIncome();
+		byte[] proof = session.respond(income.getPublicKey(), income.getProof());
+		return new ProofPacket(State.M4, new Proof(proof));
 	}
 }

@@ -38,9 +38,15 @@ public enum Group {
 	public BigInteger getN() {
 		return prime;
 	}
+	public byte[] getNAsArr() {
+		return prime.toByteArray();
+	}
 	
 	public BigInteger getG() {
 		return generator;
+	}
+	public byte[] getGAsArr() {
+		return generator.toByteArray();
 	}
 	
 

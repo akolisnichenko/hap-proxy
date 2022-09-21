@@ -27,6 +27,7 @@ public class PacketHandler implements GenericHandler<HapRequest>{
 				.deviceId(Optional.ofNullable(headers.get("id"))
 						.map(Object::toString)
 						.orElse(null))
+				.income(payload.getBody())
 				.build(); 
 		return stateService.onNext(context);
 
