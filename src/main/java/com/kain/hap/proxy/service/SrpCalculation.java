@@ -20,9 +20,19 @@ public class SrpCalculation {
 
 	public static byte[] generateServerPublic(Group group, byte[] verifier, byte[] privateKey) {
 		// TODO: move constant to group
-		byte[] k = hash(Group.G_3072_BIT.getNAsArr(), SrpCalculation.trimBigInt(Group.G_3072_BIT.getG()));
+		/*byte[] k = hash(Group.G_3072_BIT.getNAsArr(), SrpCalculation.trimBigInt(Group.G_3072_BIT.getG()));
 		return trimBigInt(new BigInteger(1, k).multiply(new BigInteger(1, verifier))
-				.add(group.getG().modPow(new BigInteger(1, privateKey), group.getN())));
+				.add(group.getG().modPow(new BigInteger(1, privateKey), group.getN()))); */
+		
+		// old implementation
+		
+		byte[]k = hash(group.getNAsArr(), SrpCalculation.trimBigInt(group.getG()));
+		
+		BigInteger B1 = new BigInteger(1, k).multiply(new BigInteger(1, verifier));
+		BigInteger B2 =	group.getG().modPow(new BigInteger(1, privateKey), group.getN());
+		BigInteger sum = B1.add(B2);
+		BigInteger publicValue = sum.mod(group.getN());
+		return trimBigInt(publicValue);
 	}
 
 	public static byte[] calculateVerifier(Group group, byte[] hashData) {

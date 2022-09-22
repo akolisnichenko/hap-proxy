@@ -53,8 +53,9 @@ public class AccessorySession extends SrpSession {
 		secret =  A
 		.multiply(new BigInteger(1, verifier).multiply(new BigInteger(1, u)))
 		.modPow(new BigInteger(1, privateKey), Group.G_3072_BIT.getN()).toByteArray();
-		
-		byte[] M2 = hash(externalKey, proof.getProof(), secret);
+		//shared session key
+		byte[] K = hash(secret);
+		byte[] M2 = hash(externalKey, proof.getProof(), K);
 		return M2;
 	}
 }

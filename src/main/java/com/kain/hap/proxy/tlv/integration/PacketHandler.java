@@ -24,7 +24,7 @@ public class PacketHandler implements GenericHandler<HapRequest>{
 		log.debug("Here is packet: {}", payload);
 		StateContext context = StateContext.builder()
 				.state(payload.getBody().getState())
-				.deviceId(Optional.ofNullable(headers.get("id"))
+				.deviceId(Optional.ofNullable(headers.get("ip_connectionId"))
 						.map(Object::toString)
 						.orElse(null))
 				.income(payload.getBody())
