@@ -17,10 +17,13 @@ public final class DeviceSession extends SrpSession {
 	
 	// external data
 	private byte[] externalPubKey; // B
-	@Getter
 	private byte[] salt;
 
-
+	// For tests only 
+	public DeviceSession(Group group, byte[] testKey) {
+		privateKey = testKey;
+		publicKey = SrpCalculation.generateClientPublic(group, privateKey);
+	}
 
 	public DeviceSession() {
 		privateKey = generate(KEY_LENGTH);

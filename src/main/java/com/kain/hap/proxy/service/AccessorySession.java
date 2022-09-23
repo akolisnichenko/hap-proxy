@@ -12,7 +12,7 @@ import com.kain.hap.proxy.tlv.type.SrpPublicKey;
 
 import lombok.Getter;
 
-public class AccessorySession extends SrpSession {
+public final class AccessorySession extends SrpSession {
 	//constants
 	private static final String IDENTIFIER = "Pair-Setup";
 	
@@ -31,29 +31,44 @@ public class AccessorySession extends SrpSession {
 	
 	private byte[] secret;
 	
+	// For tests only 
+	public AccessorySession(Group group, String username, String password, byte[] salt, byte[] privateKey) {
+		this.salt = salt;
+		x = hash(salt, hash(username, ":", password));
+		verifier = calculateVerifier(group, x);
+		this.privateKey = privateKey;
+		publicKey = generateServerPublic(group, verifier, this.privateKey);
+	}
+	
 	
 	public AccessorySession(String setupCode) {
 		salt = generate(SALT_LENGTH);
 		x = hash(salt, hash(IDENTIFIER, ":", setupCode));
-		verifier = calculateVerifier(Group.G_3072_BIT, x);
+		verifier = calculateVerifier(GROUP, x);
 		privateKey = generate(KEY_LENGTH);
-		publicKey = generateServerPublic(Group.G_3072_BIT, verifier, privateKey);
+		publicKey = generateServerPublic(GROUP, verifier, privateKey);
 	}
 	
 	public byte[] respond(SrpPublicKey clientKey, Proof proof) {
 		externalKey = clientKey.getKey();
-		byte[] u = hash(externalKey, publicKey);
+		
+		int padLength = (GROUP.getN().bitLength() + 7) / 8 ;
+		
+		byte[] u = hash(SrpCalculation.paddedBigInt(new BigInteger(1, externalKey), padLength),
+				SrpCalculation.paddedBigInt(new BigInteger(1,publicKey), padLength));
 		
 		BigInteger A = new BigInteger(1, externalKey);
-		if(A.mod(Group.G_3072_BIT.getN()).equals(BigInteger.ZERO)) {
+		if(A.mod(GROUP.getN()).equals(BigInteger.ZERO)) {
 			// BAD PUBLIC KEY ERROR
 		}
-
+/*
 		//(A * v^u) ^ b % N
 		secret =  A
 		.multiply(new BigInteger(1, verifier).multiply(new BigInteger(1, u)))
-		.modPow(new BigInteger(1, privateKey), Group.G_3072_BIT.getN()).toByteArray();
+		.modPow(new BigInteger(1, privateKey), GROUP.getN()).toByteArray();
+	*/
 		
+		secret = SrpCalculation.trimBigInt(new BigInteger(1, verifier).modPow(new BigInteger(1,u), GROUP.getN()).multiply(A).modPow(new BigInteger(1, privateKey), GROUP.getN()));
 		byte[] M2 = hash(externalKey, proof.getProof(), secret);
 		return M2;
 	}
