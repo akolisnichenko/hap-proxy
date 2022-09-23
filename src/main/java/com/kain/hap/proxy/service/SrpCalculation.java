@@ -20,6 +20,7 @@ public class SrpCalculation {
 
 	public static byte[] generateServerPublic(Group group, final byte[] verifier, final byte[] privateKey) {
 		// TODO: move constant to group
+
 		int padLength = (group.getN().bitLength() + 7) / 8 ;
 		byte[] k = hash(paddedBigInt(group.getN(), padLength), paddedBigInt(group.getG(), padLength));
 		return trimBigInt(group.getG().modPow(new BigInteger(1, privateKey), group.getN()).add(new BigInteger(1, verifier).multiply(new BigInteger(1, k))).mod(group.getN()));

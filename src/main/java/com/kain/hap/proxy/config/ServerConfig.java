@@ -10,6 +10,7 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.MessageChannels;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.ip.dsl.Tcp;
+import org.springframework.integration.ip.tcp.connection.AbstractClientConnectionFactory;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
@@ -39,15 +40,18 @@ public class ServerConfig {
 	public MessageChannel outcome() {
 		return MessageChannels.direct().get();
 	}
-
+	
 	@Bean
 	public IntegrationFlow accessory() {
 		return IntegrationFlows
 				.from(Tcp
 						.inboundGateway(Tcp.netServer(accessoryPort)
+								.soKeepAlive(true)
+								.leaveOpen(true)
 								.deserializer(new HttpPacketDeserializer())
 								.serializer(new BasePacketSerializer())
-								.backlog(30))
+								.backlog(30)
+								.singleUseConnections(false)) // need for correct work
 						.errorChannel(errorChannel()).id("tcpIn"))
 				.channel(income())
 				.get();

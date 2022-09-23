@@ -61,13 +61,7 @@ public final class AccessorySession extends SrpSession {
 		if(A.mod(GROUP.getN()).equals(BigInteger.ZERO)) {
 			// BAD PUBLIC KEY ERROR
 		}
-/*
-		//(A * v^u) ^ b % N
-		secret =  A
-		.multiply(new BigInteger(1, verifier).multiply(new BigInteger(1, u)))
-		.modPow(new BigInteger(1, privateKey), GROUP.getN()).toByteArray();
-	*/
-		
+	
 		secret = SrpCalculation.trimBigInt(new BigInteger(1, verifier).modPow(new BigInteger(1,u), GROUP.getN()).multiply(A).modPow(new BigInteger(1, privateKey), GROUP.getN()));
 		byte[] M2 = hash(externalKey, proof.getProof(), secret);
 		return M2;
