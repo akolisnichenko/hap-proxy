@@ -20,8 +20,9 @@ import com.kain.hap.proxy.tlv.serialize.HttpPacketDeserializer;
 
 @Configuration
 public class ServerConfig {
-	@Value("${server.port:54321}")
+	@Value("${accessory.port:54321}")
 	private int accessoryPort;
+	
 	
 	@Autowired
 	private PacketHandler packetHandler;
@@ -35,12 +36,7 @@ public class ServerConfig {
 	public MessageChannel income() {
 		return MessageChannels.direct().get();
 	}
-	
-	@Bean
-	public MessageChannel outcome() {
-		return MessageChannels.direct().get();
-	}
-	
+
 	@Bean
 	public IntegrationFlow accessory() {
 		return IntegrationFlows
@@ -56,6 +52,7 @@ public class ServerConfig {
 				.channel(income())
 				.get();
 	}
+
 
 	
 	@Bean
