@@ -10,11 +10,10 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.MessageChannels;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.ip.dsl.Tcp;
-import org.springframework.integration.ip.tcp.connection.AbstractClientConnectionFactory;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
-import com.kain.hap.proxy.tlv.integration.PacketHandler;
+import com.kain.hap.proxy.tlv.integration.RequestHandler;
 import com.kain.hap.proxy.tlv.serialize.BasePacketSerializer;
 import com.kain.hap.proxy.tlv.serialize.HttpPacketDeserializer;
 
@@ -23,9 +22,8 @@ public class ServerConfig {
 	@Value("${accessory.port:54321}")
 	private int accessoryPort;
 	
-	
 	@Autowired
-	private PacketHandler packetHandler;
+	private RequestHandler requestHandler;
 	
 	@Bean
 	public MessageChannel errorChannel() {
@@ -58,7 +56,7 @@ public class ServerConfig {
 	@Bean
 	public IntegrationFlow incomePacketHandler() {
 		return IntegrationFlows.from(income())
-				.handle(packetHandler)
+				.handle(requestHandler)
 				.get();
 	}
 

@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class PacketHandler implements GenericHandler<HapRequest>{
+public class RequestHandler implements GenericHandler<HapRequest>{
 	private final AccessoryStateService stateService;
 
 	@Override

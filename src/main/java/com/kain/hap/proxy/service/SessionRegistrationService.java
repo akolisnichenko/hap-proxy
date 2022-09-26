@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SessionRegistrationService {
 	private Map<String, AccessorySession> sessions = Maps.newConcurrentMap();
+	private Map<String, DeviceSession> devices = Maps.newConcurrentMap();
 	@Value("${accessory.setup.code}")
 	private String setupCode;
 	
@@ -21,10 +22,20 @@ public class SessionRegistrationService {
 		sessions.put(deviceId, session);
 		return session;
 	}
+	
+	public DeviceSession registerDevice(String deviceId) {
+		DeviceSession session = new DeviceSession();
+		devices.put(deviceId, session);
+		return session;
+	}
 
 	//TODO: replace by error if not exist 
 	public AccessorySession getSession(String deviceId) {
 		return sessions.get(deviceId);
+	}
+	
+	public DeviceSession getDeviceSession(String deviceId) {
+		return devices.get(deviceId);
 	}
 
 }
