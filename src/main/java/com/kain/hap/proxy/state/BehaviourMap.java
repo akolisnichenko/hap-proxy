@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.kain.hap.proxy.service.SessionRegistrationService;
+import com.kain.hap.proxy.state.setup.DeviceProofStep;
 import com.kain.hap.proxy.state.setup.ErrorStep;
 import com.kain.hap.proxy.state.setup.ProofStep;
 import com.kain.hap.proxy.state.setup.SaltStep;
@@ -27,7 +28,10 @@ public class BehaviourMap {
 	private void init() {
 		nextSteps = Map.of(//null, new InitialStep(),
 				State.M1, new SaltStep(sessionService),
-				State.M3, new ProofStep(sessionService));
+				State.M3, new ProofStep(sessionService),
+				
+				
+				State.M2, new DeviceProofStep(sessionService));
 	}
 	
 	public BehaviourState getNextStep(State state) {

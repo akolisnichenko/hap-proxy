@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kain.hap.proxy.tlv.Method;
 import com.kain.hap.proxy.tlv.State;
+import com.kain.hap.proxy.tlv.packet.HapRequest;
 import com.kain.hap.proxy.tlv.packet.MethodPacket;
 
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,9 @@ public class AdminToolController {
 	@GetMapping("/hap/device/M1")
 	@ResponseStatus(code = HttpStatus.OK)
 	public void startDevicePacket() {
-		outcome.send(MessageBuilder.withPayload(new MethodPacket(State.M1, Method.PAIR_SETUP)).build());
+		HapRequest initialRequest = new HapRequest();
+		initialRequest.setBody(new MethodPacket(State.M1, Method.PAIR_SETUP));
+		outcome.send(MessageBuilder.withPayload(initialRequest).build());
 	}
 
 }
