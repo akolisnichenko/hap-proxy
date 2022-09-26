@@ -1,6 +1,7 @@
 package com.kain.hap.proxy.state;
 
 import com.kain.hap.proxy.tlv.State;
+import com.kain.hap.proxy.tlv.packet.BasePacket;
 
 import lombok.Builder;
 import lombok.Data;
@@ -13,4 +14,6 @@ import lombok.Data;
 public class StateContext {
 	private String deviceId;
 	private State state;
+	private BasePacket income;
+	
 }

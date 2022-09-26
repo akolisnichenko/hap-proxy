@@ -1,33 +1,41 @@
 package com.kain.hap.proxy.service;
 
-import java.security.SecureRandom;
-
 import com.kain.hap.proxy.srp.Group;
+import com.kain.hap.proxy.tlv.type.Salt;
+import com.kain.hap.proxy.tlv.type.SrpPublicKey;
 
 import lombok.Getter;
 
 //Client
-public final class DeviceSession {
-	@Getter
-	private final byte[] salt;
+public final class DeviceSession extends SrpSession {
+	
+	// internal data 
 	private final byte[] privateKey; // a
 	@Getter
 	private byte[] publicKey; // A
 	
-	private static final int SALT_LENGTH = 16;
-	private static final int KEY_LENGTH = 64;
-	private static final SecureRandom random = new SecureRandom();
 	
-	private byte[] generate(int length) {
-		byte[] generated = new byte[length];
-		random.nextBytes(generated);
-		return generated;
+	// external data
+	private byte[] externalPubKey; // B
+	private byte[] salt;
+
+	// For tests only 
+	public DeviceSession(Group group, byte[] testKey) {
+		privateKey = testKey;
+		publicKey = SrpCalculation.generateClientPublic(group, privateKey);
 	}
-	
+
 	public DeviceSession() {
-		salt = generate(SALT_LENGTH);
 		privateKey = generate(KEY_LENGTH);
 		publicKey = SrpCalculation.generateClientPublic(Group.G_3072_BIT, privateKey);
 	}
+	
+	public byte[] respond(SrpPublicKey pubKey, Salt salt) {
+		externalPubKey = pubKey.getKey();
+		this.salt = salt.getSalt();
+		return new byte[0];
+		
+	}
 
+	
 }

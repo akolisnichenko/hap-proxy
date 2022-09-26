@@ -7,6 +7,13 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum Group {
+	G_1024_BIT(toBigInt(new int[] {0xEEAF0AB9, 0xADB38DD6, 0x9C33F80A, 0xFA8FC5E8, 0x60726187, 0x75FF3C0B, 0x9EA2314C,
+			0x9C256576, 0xD674DF74, 0x96EA81D3, 0x383B4813, 0xD692C6E0, 0xE0D5D8E2, 0x50B98BE4,
+			0x8E495C1D, 0x6089DAD1, 0x5DC7D7B4, 0x6154D6B6, 0xCE8EF4AD, 0x69B15D49, 0x82559B29,
+			0x7BCF1885, 0xC529F566, 0x660E57EC, 0x68EDBC3C, 0x05726CC0, 0x2FD4CBF4, 0x976EAA9A,
+			0xFD5138FE, 0x8376435B, 0x9FC61D2F, 0xC0EB06E3}), 
+			BigInteger.valueOf(2l)),
+	
 	G_3072_BIT(toBigInt( new int[] { 0xFFFFFFFF, 0xFFFFFFFF, 0xC90FDAA2, 0x2168C234, 0xC4C6628B, 0x80DC1CD1, 0x29024E08,
 		0x8A67CC74, 0x020BBEA6, 0x3B139B22, 0x514A0879, 0x8E3404DD, 0xEF9519B3, 0xCD3A431B,
 		0x302B0A6D, 0xF25F1437, 0x4FE1356D, 0x6D51C245, 0xE485B576, 0x625E7EC6, 0xF44C42E9,
@@ -38,9 +45,15 @@ public enum Group {
 	public BigInteger getN() {
 		return prime;
 	}
+	public byte[] getNAsArr() {
+		return prime.toByteArray();
+	}
 	
 	public BigInteger getG() {
 		return generator;
+	}
+	public byte[] getGAsArr() {
+		return generator.toByteArray();
 	}
 	
 
