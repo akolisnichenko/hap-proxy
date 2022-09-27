@@ -5,13 +5,16 @@ import static com.kain.hap.proxy.service.SrpCalculation.generateServerPublic;
 import static com.kain.hap.proxy.service.SrpCalculation.hash;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import com.kain.hap.proxy.srp.Group;
 import com.kain.hap.proxy.tlv.type.Proof;
 import com.kain.hap.proxy.tlv.type.SrpPublicKey;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class AccessorySession extends SrpSession {
 	//constants
 	private static final String IDENTIFIER = "Pair-Setup";
@@ -63,7 +66,12 @@ public final class AccessorySession extends SrpSession {
 		}
 	
 		secret = SrpCalculation.trimBigInt(new BigInteger(1, verifier).modPow(new BigInteger(1,u), GROUP.getN()).multiply(A).modPow(new BigInteger(1, privateKey), GROUP.getN()));
-		byte[] M2 = hash(externalKey, proof.getProof(), secret);
-		return M2;
+		byte[] K = hash(secret);
+		byte[] validM = hash(externalKey, privateKey, secret);
+		
+		if (validM != proof.getProof()) {
+			log.error("Not equal proof");
+		}
+		return hash(externalKey, proof.getProof(), K);
 	}
 }
