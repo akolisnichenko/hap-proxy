@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.kain.hap.proxy.tlv.Method;
 import com.kain.hap.proxy.tlv.State;
 import com.kain.hap.proxy.tlv.Type;
+import com.kain.hap.proxy.tlv.type.Encrypted;
 import com.kain.hap.proxy.tlv.type.Proof;
 import com.kain.hap.proxy.tlv.type.Salt;
 import com.kain.hap.proxy.tlv.type.SrpPublicKey;
@@ -40,6 +41,7 @@ public class TypeSerializer {
 		register(new MethodSerilizer());
 		register(new KeySerilizer());
 		register(new ProofSerilizer());
+		register(new EncryptSerializer());
 	}
 	
 	class SaltSerilizer extends GenericSerializer<Salt> {
@@ -99,6 +101,16 @@ public class TypeSerializer {
 		}
 	}
 	
+	class EncryptSerializer extends GenericSerializer<Encrypted> {
+		public byte[] serialize(Encrypted val) {
+			return writeTLV(Type.ENCRYPTED_DATA.getValue(), val.getData()) ;
+		}
+
+		@Override
+		public Class<Encrypted> getTypeClass() {
+			return Encrypted.class;
+		}
+	}
 	
 	
 }

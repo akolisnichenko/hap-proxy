@@ -1,5 +1,9 @@
 package com.kain.hap.proxy.service;
 
+import static com.kain.hap.proxy.service.SrpCalculation.hash;
+
+import java.math.BigInteger;
+
 import com.kain.hap.proxy.srp.Group;
 import com.kain.hap.proxy.tlv.type.Salt;
 import com.kain.hap.proxy.tlv.type.SrpPublicKey;
@@ -30,8 +34,15 @@ public final class DeviceSession extends SrpSession {
 		publicKey = SrpCalculation.generateClientPublic(Group.G_3072_BIT, privateKey);
 	}
 	
-	public byte[] respond(SrpPublicKey pubKey, Salt salt) {
-		externalPubKey = pubKey.getKey();
+	public byte[] respond(SrpPublicKey externalKey, Salt salt) {
+		externalPubKey = externalKey.getKey();
+		int padLength = (GROUP.getN().bitLength() + 7) / 8 ;
+		byte[] u = hash(SrpCalculation.paddedBigInt(new BigInteger(1, externalPubKey), padLength),
+				SrpCalculation.paddedBigInt(new BigInteger(1,publicKey), padLength));
+		
+		
+		//byte[] x = hash(salt, hash(IDENTIFIER, ":", setupCode));
+
 		this.salt = salt.getSalt();
 		return new byte[0];
 		
