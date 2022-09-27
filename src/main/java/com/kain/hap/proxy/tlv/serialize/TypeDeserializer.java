@@ -10,7 +10,9 @@ import com.kain.hap.proxy.tlv.packet.DeviceProofPacket;
 import com.kain.hap.proxy.tlv.packet.ErrorPacket;
 import com.kain.hap.proxy.tlv.packet.MethodPacket;
 import com.kain.hap.proxy.tlv.packet.ProofPacket;
+import com.kain.hap.proxy.tlv.packet.SaltPacket;
 import com.kain.hap.proxy.tlv.type.Proof;
+import com.kain.hap.proxy.tlv.type.Salt;
 import com.kain.hap.proxy.tlv.type.SrpPublicKey;
 
 public class TypeDeserializer {
@@ -38,6 +40,11 @@ public class TypeDeserializer {
 
 	private Object convertToObject(TlvWrapper wrapper) {
 		
+		if (wrapper.contains(Type.SALT.getValue())) {
+			return new SaltPacket(State.toState(wrapper.getOne(Type.STATE.getValue())),
+					new SrpPublicKey(wrapper.get(Type.PUBLIC_KEY.getValue())),
+					new Salt(wrapper.get(Type.SALT.getValue())));
+		}
 		if (wrapper.contains(Type.PUBLIC_KEY.getValue())) {
 			return new DeviceProofPacket(State.toState(wrapper.getOne(Type.STATE.getValue())),
 					new Proof(wrapper.get(Type.PROOF.getValue())),

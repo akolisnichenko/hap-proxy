@@ -36,14 +36,12 @@ public final class DeviceSession extends SrpSession {
 	
 	public byte[] respond(SrpPublicKey externalKey, Salt salt) {
 		externalPubKey = externalKey.getKey();
+		this.salt = salt.getSalt();
+		
 		int padLength = (GROUP.getN().bitLength() + 7) / 8 ;
 		byte[] u = hash(SrpCalculation.paddedBigInt(new BigInteger(1, externalPubKey), padLength),
 				SrpCalculation.paddedBigInt(new BigInteger(1,publicKey), padLength));
-		
-		
-		//byte[] x = hash(salt, hash(IDENTIFIER, ":", setupCode));
-
-		this.salt = salt.getSalt();
+				
 		return new byte[0];
 		
 	}

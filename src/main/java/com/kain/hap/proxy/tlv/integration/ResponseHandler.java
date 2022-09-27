@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.kain.hap.proxy.state.AccessoryStateService;
 import com.kain.hap.proxy.state.StateContext;
+import com.kain.hap.proxy.tlv.packet.HapRequest;
 import com.kain.hap.proxy.tlv.packet.HapResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,11 @@ public class ResponseHandler implements GenericHandler<HapResponse>{
 						.orElse(null))
 				.income(payload.getBody())
 				.build(); 
-		return stateService.onNext(context);
-
+		//return stateService.onNext(context);
+		
+		
+		HapRequest request = new HapRequest();
+		request.setBody(stateService.onNext(context));
+		return request;
 	}
 }

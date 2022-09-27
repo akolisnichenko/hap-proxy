@@ -1,4 +1,4 @@
-package com.kain.hap.proxy.state.setup;
+package com.kain.hap.proxy.state.setup.device;
 
 import com.kain.hap.proxy.service.DeviceSession;
 import com.kain.hap.proxy.service.SessionRegistrationService;
@@ -19,11 +19,9 @@ public class DeviceProofStep implements BehaviourState {
 
 	@Override
 	public BasePacket handle(StateContext context) {
-		DeviceSession session = sessionService.getDeviceSession(context.getDeviceId());
+		DeviceSession session = sessionService.registerDevice(context.getDeviceId());
 		SaltPacket income = (SaltPacket)context.getIncome();
 		byte[] proof = session.respond(income.getPublicKey(), income.getSalt());
-		//TODO: return correct packet as response
 		return new DeviceProofPacket(State.M3, new Proof(proof), new SrpPublicKey(session.getPublicKey()));
 	}
-
 }

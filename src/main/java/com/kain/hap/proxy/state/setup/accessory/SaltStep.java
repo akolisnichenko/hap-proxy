@@ -1,4 +1,4 @@
-package com.kain.hap.proxy.state.setup;
+package com.kain.hap.proxy.state.setup.accessory;
 
 import com.kain.hap.proxy.service.AccessorySession;
 import com.kain.hap.proxy.service.SessionRegistrationService;
