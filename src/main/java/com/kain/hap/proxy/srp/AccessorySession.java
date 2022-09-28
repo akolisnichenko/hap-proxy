@@ -6,6 +6,7 @@ import static com.kain.hap.proxy.srp.SrpCalculation.hash;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import com.kain.hap.proxy.tlv.type.Proof;
 import com.kain.hap.proxy.tlv.type.SrpPublicKey;
@@ -70,10 +71,10 @@ public final class AccessorySession extends SrpSession {
 		
 		byte[] validM = calculateM();
 		
-		if (validM != proof.getProof()) {
+		if (!Arrays.equals(validM, proof.getProof())) {
 			log.error("Not equal proof");
 		}
-		return hash(externalKey, proof.getProof(), K);
+		return hash(externalKey, validM, K);
 	}
 	
 	private byte[] calculateM() {
@@ -82,7 +83,7 @@ public final class AccessorySession extends SrpSession {
 		byte[] K = hash(secret);
 		byte[] hU = hash(username);
 		
-		byte[] M = hash(xor(hN, hG), hU, salt, externalKey, privateKey, K);
+		byte[] M = hash(xor(hN, hG), hU, salt, externalKey, publicKey, K);
 		return M;
 		
 	}

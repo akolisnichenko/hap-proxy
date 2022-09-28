@@ -4,6 +4,7 @@ import static com.kain.hap.proxy.srp.SrpCalculation.hash;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import com.kain.hap.proxy.tlv.type.Salt;
 import com.kain.hap.proxy.tlv.type.SrpPublicKey;
@@ -66,7 +67,9 @@ public final class DeviceSession extends SrpSession {
 		secret = SrpCalculation.trimBigInt(new BigInteger(1, externalPubKey).subtract(tmp).modPow(exp, GROUP.getN()));
 		//M1 = hash(publicKey, externalPubKey, secret);
 		
+		// WTF ???
 		M1 = calculateM();
+//		byte[] M = hash(publicKey, M1, hash(secret));
 				
 		return M1;
 	}
@@ -84,9 +87,10 @@ public final class DeviceSession extends SrpSession {
 		
 	}
 
+
 	public void verify(byte[] data) {
-		byte[] M2 = hash(publicKey, M1, secret);
-		if (data != M2) {
+		byte[] M2 = hash(publicKey, M1, hash(secret));
+		if (!Arrays.equals(data,M2)) {
 			log.error("Not valid result evidance message");
 		}
 	}
