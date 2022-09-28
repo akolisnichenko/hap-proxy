@@ -1,4 +1,4 @@
-package com.kain.hap.proxy.service;
+package com.kain.hap.proxy.srp;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 import com.google.common.hash.Hashing;
 import com.google.common.primitives.Bytes;
-import com.kain.hap.proxy.srp.Group;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

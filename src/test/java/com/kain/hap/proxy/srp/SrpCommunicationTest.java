@@ -1,18 +1,16 @@
 package com.kain.hap.proxy.srp;
 
-import static com.kain.hap.proxy.service.SrpCalculation.hash;
+import static com.kain.hap.proxy.srp.SrpCalculation.hash;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import com.kain.hap.proxy.service.AccessorySession;
-import com.kain.hap.proxy.service.DeviceSession;
 import com.kain.hap.proxy.tlv.type.Proof;
 import com.kain.hap.proxy.tlv.type.Salt;
 import com.kain.hap.proxy.tlv.type.SrpPublicKey;
 
-public class ServerSession {
+public class SrpCommunicationTest {
 	
 	
 	@Test

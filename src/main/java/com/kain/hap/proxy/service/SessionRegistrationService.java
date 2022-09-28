@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Maps;
+import com.kain.hap.proxy.srp.AccessorySession;
+import com.kain.hap.proxy.srp.DeviceSession;
 
 import lombok.RequiredArgsConstructor;
 

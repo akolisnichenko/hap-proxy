@@ -1,8 +1,6 @@
-package com.kain.hap.proxy.service;
+package com.kain.hap.proxy.srp;
 
 import java.security.SecureRandom;
-
-import com.kain.hap.proxy.srp.Group;
 
 
 // TODO: add group and predefined settings from group

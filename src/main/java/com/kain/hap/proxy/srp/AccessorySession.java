@@ -1,13 +1,12 @@
-package com.kain.hap.proxy.service;
+package com.kain.hap.proxy.srp;
 
-import static com.kain.hap.proxy.service.SrpCalculation.calculateVerifier;
-import static com.kain.hap.proxy.service.SrpCalculation.generateServerPublic;
-import static com.kain.hap.proxy.service.SrpCalculation.hash;
+import static com.kain.hap.proxy.srp.SrpCalculation.calculateVerifier;
+import static com.kain.hap.proxy.srp.SrpCalculation.generateServerPublic;
+import static com.kain.hap.proxy.srp.SrpCalculation.hash;
 
 import java.math.BigInteger;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 
-import com.kain.hap.proxy.srp.Group;
 import com.kain.hap.proxy.tlv.type.Proof;
 import com.kain.hap.proxy.tlv.type.SrpPublicKey;
 
@@ -30,11 +29,12 @@ public final class AccessorySession extends SrpSession {
 	
 	//external data
 	private byte[] externalKey; // A
-	
+	private String username;
 	private byte[] secret;
 	
 	// For tests only 
 	public AccessorySession(Group group, String username, String password, byte[] salt, byte[] privateKey) {
+		this.username = username;
 		this.salt = salt;
 		x = hash(salt, hash(username, ":", password));
 		verifier = calculateVerifier(group, x);
@@ -44,6 +44,7 @@ public final class AccessorySession extends SrpSession {
 	
 	
 	public AccessorySession(String setupCode) {
+		username = IDENTIFIER;
 		salt = generate(SALT_LENGTH);
 		x = hash(salt, hash(IDENTIFIER, ":", setupCode));
 		verifier = calculateVerifier(GROUP, x);
@@ -67,7 +68,7 @@ public final class AccessorySession extends SrpSession {
 		secret = SrpCalculation.trimBigInt(new BigInteger(1, verifier).modPow(new BigInteger(1,u), GROUP.getN()).multiply(A).modPow(new BigInteger(1, privateKey), GROUP.getN()));
 		byte[] K = hash(secret);
 		
-		byte[] validM = hash(externalKey, privateKey, secret);
+		byte[] validM = calculateM();
 		
 		if (validM != proof.getProof()) {
 			log.error("Not equal proof");
@@ -75,7 +76,18 @@ public final class AccessorySession extends SrpSession {
 		return hash(externalKey, proof.getProof(), K);
 	}
 	
-	 private static byte[] xor(byte[] b1, byte[] b2) {
+	private byte[] calculateM() {
+		byte[] hN = hash(GROUP.getNAsArr());
+		byte[] hG = hash(GROUP.getGAsArr());
+		byte[] K = hash(secret);
+		byte[] hU = hash(username);
+		
+		byte[] M = hash(xor(hN, hG), hU, salt, externalKey, privateKey, K);
+		return M;
+		
+	}
+	
+	 private byte[] xor(byte[] b1, byte[] b2) {
 		    byte[] result = new byte[b1.length];
 		    for (int i = 0; i < b1.length; i++) {
 		      result[i] = (byte) (b1[i] ^ b2[i]);

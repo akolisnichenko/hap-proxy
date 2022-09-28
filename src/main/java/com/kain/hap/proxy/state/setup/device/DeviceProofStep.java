@@ -1,7 +1,7 @@
 package com.kain.hap.proxy.state.setup.device;
 
-import com.kain.hap.proxy.service.DeviceSession;
 import com.kain.hap.proxy.service.SessionRegistrationService;
+import com.kain.hap.proxy.srp.DeviceSession;
 import com.kain.hap.proxy.state.BehaviourState;
 import com.kain.hap.proxy.state.StateContext;
 import com.kain.hap.proxy.tlv.State;
