@@ -13,6 +13,8 @@ public abstract class SrpSession {
 	
 	//protected static final Group GROUP = Group.G_1024_BIT;
 	protected static final Group GROUP = Group.G_3072_BIT;
+	//constants
+	protected static final String IDENTIFIER = "Pair-Setup";
 	
 	protected byte[] generate(int length) {
 		byte[] generated = new byte[length];

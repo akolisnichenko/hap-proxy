@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.kain.hap.proxy.state.AccessoryStateService;
 import com.kain.hap.proxy.state.StateContext;
+import com.kain.hap.proxy.tlv.packet.ErrorPacket;
 import com.kain.hap.proxy.tlv.packet.HapRequest;
 import com.kain.hap.proxy.tlv.packet.HapResponse;
 
@@ -31,7 +32,10 @@ public class ResponseHandler implements GenericHandler<HapResponse>{
 						.orElse(null))
 				.income(payload.getBody())
 				.build(); 
-		//return stateService.onNext(context);
+		if (payload.getBody() instanceof ErrorPacket packet) {
+			log.error("Got HAP Error: {}", packet.getError());
+			return null;
+		}
 		
 		
 		HapRequest request = new HapRequest();

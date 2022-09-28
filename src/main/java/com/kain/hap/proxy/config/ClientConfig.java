@@ -89,6 +89,7 @@ public class ClientConfig {
 	public IntegrationFlow accessoryResResponseHandler() {
 		return IntegrationFlows.from(response())
 				.handle(responseHandler)
+				.channel(outcome())
 				.get();
 	}
 

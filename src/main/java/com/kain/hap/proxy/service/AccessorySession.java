@@ -16,8 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class AccessorySession extends SrpSession {
-	//constants
-	private static final String IDENTIFIER = "Pair-Setup";
+
 	
 	//internal data
 	@Getter
@@ -67,6 +66,7 @@ public final class AccessorySession extends SrpSession {
 	
 		secret = SrpCalculation.trimBigInt(new BigInteger(1, verifier).modPow(new BigInteger(1,u), GROUP.getN()).multiply(A).modPow(new BigInteger(1, privateKey), GROUP.getN()));
 		byte[] K = hash(secret);
+		
 		byte[] validM = hash(externalKey, privateKey, secret);
 		
 		if (validM != proof.getProof()) {
@@ -74,4 +74,12 @@ public final class AccessorySession extends SrpSession {
 		}
 		return hash(externalKey, proof.getProof(), K);
 	}
+	
+	 private static byte[] xor(byte[] b1, byte[] b2) {
+		    byte[] result = new byte[b1.length];
+		    for (int i = 0; i < b1.length; i++) {
+		      result[i] = (byte) (b1[i] ^ b2[i]);
+		    }
+		    return result;
+		  }
 }

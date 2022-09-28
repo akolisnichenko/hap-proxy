@@ -24,7 +24,7 @@ public class SessionRegistrationService {
 	}
 	
 	public DeviceSession registerDevice(String deviceId) {
-		DeviceSession session = new DeviceSession();
+		DeviceSession session = new DeviceSession(setupCode);
 		devices.put(deviceId, session);
 		return session;
 	}
