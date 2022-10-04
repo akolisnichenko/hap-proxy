@@ -2,6 +2,7 @@ package com.kain.hap.proxy.tlv.integration;
 
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.handler.GenericHandler;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class ResponseHandler implements GenericHandler<HapResponse>{
+	//TODO: move to correct place
+	@Value("${real.accessory.host:localhost}")
+	private String realAccessoryHost;
+	@Value("${real.accessory.port}")
+	private int realAccessoryPort;
+	
 	private final AccessoryStateService stateService;
+	
+	private static final String CRLF = "\r\n";
 
 
 	@Override
@@ -39,6 +48,8 @@ public class ResponseHandler implements GenericHandler<HapResponse>{
 		
 		
 		HapRequest request = new HapRequest();
+		//FIXME: move const header to another place
+		request.addHeader("Host:" + realAccessoryHost + ":" + realAccessoryPort + CRLF);
 		request.setBody(stateService.onNext(context));
 		return request;
 	}

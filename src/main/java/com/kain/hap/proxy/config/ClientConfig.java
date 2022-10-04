@@ -5,13 +5,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.MessageChannels;
 import org.springframework.integration.ip.dsl.Tcp;
-import org.springframework.integration.ip.tcp.TcpOutboundGateway;
-import org.springframework.integration.ip.tcp.connection.TcpNetClientConnectionFactory;
 import org.springframework.messaging.MessageChannel;
 
 import com.kain.hap.proxy.tlv.integration.ResponseHandler;
@@ -20,9 +17,9 @@ import com.kain.hap.proxy.tlv.serialize.client.Tlv8ResponseDeserializer;
 
 @Configuration
 public class ClientConfig {
-	@Value("${real.accesssory.host:localhost}")
+	@Value("${real.accessory.host:localhost}")
 	private String realAccessoryHost;
-	@Value("${real.accesssory.port}")
+	@Value("${real.accessory.port}")
 	private int realAccessoryPort;
 	
 	@Autowired

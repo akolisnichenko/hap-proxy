@@ -46,12 +46,6 @@ public final class DeviceSession extends SrpSession {
 		pw = hash(username, ":", setupCode);
 	}
 	
-	// <premaster secret> = (B - (k * g^x)) ^ (a + (u * x)) % N
-	//                  S = ((B - k (g^x)) ^ (a + ux)) % N
-	//                  S = (B - kg^x) ^ (a + ux)
-	
-	//SC = (B − k(g^x))^(a + ux) // lost formating see on https://habr.com/ru/post/579704/
-	
 	public byte[] respond(SrpPublicKey externalKey, Salt salt) {
 		externalPubKey = externalKey.getKey();
 		this.salt = salt.getSalt();
@@ -65,18 +59,13 @@ public final class DeviceSession extends SrpSession {
 		final BigInteger exp = new BigInteger(1,u).multiply(new BigInteger(1, x)).add(new BigInteger(1,privateKey));
 		final BigInteger tmp = GROUP.getG().modPow(new BigInteger(1, x), GROUP.getN()).multiply(new BigInteger(1, k));
 		secret = SrpCalculation.trimBigInt(new BigInteger(1, externalPubKey).subtract(tmp).modPow(exp, GROUP.getN()));
-		//M1 = hash(publicKey, externalPubKey, secret);
-		
-		// WTF ???
 		M1 = calculateM();
-//		byte[] M = hash(publicKey, M1, hash(secret));
-				
 		return M1;
 	}
 	
 
 	private byte[] calculateM() {
-		byte[] hN = hash(GROUP.getNAsArr());
+		byte[] hN = hash(SrpCalculation.trimBigInt(GROUP.getN()));
 		byte[] hG = hash(GROUP.getGAsArr());
 		byte[] xorResult = xor(hN, hG);
 		byte[] K = hash(secret);
@@ -95,12 +84,12 @@ public final class DeviceSession extends SrpSession {
 		}
 	}
 	
-	 private byte[] xor(byte[] b1, byte[] b2) {
-		    byte[] result = new byte[b1.length];
-		    for (int i = 0; i < b1.length; i++) {
-		      result[i] = (byte) (b1[i] ^ b2[i]);
-		    }
-		    return result;
-		  }
+	private byte[] xor(byte[] b1, byte[] b2) {
+		byte[] result = new byte[b1.length];
+		for (int i = 0; i < b1.length; i++) {
+			result[i] = (byte) (b1[i] ^ b2[i]);
+		}
+		return result;
+	}
 	
 }

@@ -46,7 +46,7 @@ public enum Group {
 		return prime;
 	}
 	public byte[] getNAsArr() {
-		return prime.toByteArray();
+		return SrpCalculation.trimBigInt(prime);
 	}
 	
 	public BigInteger getG() {

@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class SessionRegistrationService {
 	private Map<String, AccessorySession> sessions = Maps.newConcurrentMap();
 	private Map<String, DeviceSession> devices = Maps.newConcurrentMap();
-	@Value("${accessory.setup.code}")
+	@Value("${real.accessory.setup.code}")
 	private String setupCode;
 	
 	public AccessorySession registerSession(String deviceId) {

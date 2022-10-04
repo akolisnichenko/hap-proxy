@@ -1,5 +1,6 @@
 package com.kain.hap.proxy.admin.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
@@ -25,15 +26,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminToolController {
 	
+	//TODO: move to correct place
+	@Value("${real.accessory.host:localhost}")
+	private String realAccessoryHost;
+	@Value("${real.accessory.port}")
+	private int realAccessoryPort;
+	
 	private final MessageChannel outcome;
+	
+	private static final String CRLF = "\r\n";
 
 	
 	@GetMapping("/hap/device/M1")
 	@ResponseStatus(code = HttpStatus.OK)
 	public void startDevicePacket() {
 		HapRequest initialRequest = new HapRequest();
+		initialRequest.addHeader("Host:" + realAccessoryHost + ":" + realAccessoryPort + CRLF);
 		initialRequest.setBody(new MethodPacket(State.M1, Method.PAIR_SETUP));
 		outcome.send(MessageBuilder.withPayload(initialRequest).build());
+	
 	}
+	
 
 }

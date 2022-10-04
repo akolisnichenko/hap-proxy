@@ -20,5 +20,21 @@ public abstract class SrpSession {
 		return generated;
 	}
 	
+	protected String toHex(byte[] val) {
+		StringBuilder sb = new StringBuilder();
+		int i = 0;
+		for (byte b : val) {
+			if(i % 8 == 0) {
+				sb.append("0x");
+			}
+			sb.append(String.format("%02x", b));
+			i++;
+			if( i % 8 == 0 && i != 0) {
+				sb.append(", ");
+			}
+		}
+		return sb.toString();
+	}
+	
 
 }

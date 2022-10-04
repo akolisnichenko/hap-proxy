@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MDNSConfig {
 	
-	@Value("${server.port}")
+	@Value("${accessory.port}")
 	private int accessoryPort;
 	@Value("${accessory.identifier}")
 	private String accessoryId;
@@ -52,13 +52,15 @@ public class MDNSConfig {
 	
 	
 	private static final String HAP_TYPE = "_hap._tcp.local."; 
-	
+
+	//TODO: add service info for proxy  
 
 	@Bean
 	public JmDNS jmdns() {
 		try {
 			JmDNS jmdns = JmDNS.create(InetAddress.getLocalHost());
-			jmdns.registerService(serviceInfo());
+			jmdns.registerService(accessoryServiceInfo());
+//			jmdns.registerService(proxyServiceInfo());
 			jmdns.addServiceListener(HAP_TYPE, disoveryService());
 			return jmdns;
 		} catch (IOException e) {
@@ -68,13 +70,36 @@ public class MDNSConfig {
 	}
 	
 	@Bean
-	public ServiceInfo serviceInfo() {
+	public ServiceInfo accessoryServiceInfo() {
+		return ServiceInfo.create(HAP_TYPE, accessoryModel, accessoryPort, 0, 0, accessoryDNSProp());
+	}
+	
+	@Bean
+	public ServiceInfo proxyServiceInfo() {
 		return ServiceInfo.create(HAP_TYPE, accessoryModel, accessoryPort, 0, 0, accessoryDNSProp());
 	}
 	
 	@Bean
 	public MulticastDNSDiscoveryService disoveryService() {
 		return new MulticastDNSDiscoveryService();
+	}
+	
+	@Bean 
+	public Map<String, String> proxyDNSProp(){
+		Map<String, String> map = new HashMap<>();
+		map.put("md", accessoryModel); // Model name of the accessory (e.g. "Device1,1"). Required.
+		map.put("id", accessoryId); // Device ID (Device ID (page 36)) of the accessory. The Device ID must
+											// be formatted as "XX:XX:XX:XX:XX:XX", where "XX" is a hexadecimal
+											// string representing a byte. Required.
+		map.put("c#", accessoryCN); // Current configuration number. Required.
+		map.put("s#", accessorySN); // Current state number. Required.
+		map.put("pv", accessoryProtocolVer); // Protocol version string <major>.<minor> (e.g. "1.0"). Required if value is
+								// not "1.0".
+		map.put("sf", accessoryStatusFlag);
+		map.put("ff", accessoryFeatureFlag); // Feature flags (e.g. "0x3" for bits 0 and 1). Required if non-zero. // should be 0
+		map.put("ci", accessoryCategoryId);
+		map.put("sh", getSetupHash());
+		return map;
 	}
 	
 	@Bean 

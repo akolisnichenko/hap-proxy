@@ -69,16 +69,21 @@ public final class AccessorySession extends SrpSession {
 		secret = SrpCalculation.trimBigInt(new BigInteger(1, verifier).modPow(new BigInteger(1,u), GROUP.getN()).multiply(A).modPow(new BigInteger(1, privateKey), GROUP.getN()));
 		byte[] K = hash(secret);
 		
+		log.info("secret:{}", toHex(secret));
+		log.info("secret hash:{}", toHex(K));
+		
 		byte[] validM = calculateM();
 		
 		if (!Arrays.equals(validM, proof.getProof())) {
 			log.error("Not equal proof");
 		}
-		return hash(externalKey, validM, K);
+		return hash(externalKey, proof.getProof(), K);
 	}
 	
+	
+	
 	private byte[] calculateM() {
-		byte[] hN = hash(GROUP.getNAsArr());
+		byte[] hN = hash(SrpCalculation.trimBigInt(GROUP.getN()));
 		byte[] hG = hash(GROUP.getGAsArr());
 		byte[] K = hash(secret);
 		byte[] hU = hash(username);
