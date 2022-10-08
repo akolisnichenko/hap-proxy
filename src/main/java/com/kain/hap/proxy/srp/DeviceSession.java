@@ -4,10 +4,13 @@ import static com.kain.hap.proxy.srp.SrpCalculation.hash;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
+import com.google.crypto.tink.subtle.Ed25519Sign;
+import com.google.crypto.tink.subtle.Ed25519Sign.KeyPair;
 import com.kain.hap.proxy.tlv.type.Salt;
-import com.kain.hap.proxy.tlv.type.SrpPublicKey;
+import com.kain.hap.proxy.tlv.type.PublicKey;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class DeviceSession extends SrpSession {
 	
+	@Getter
+	private String deviceId;
+
 	// internal data 
+	@Getter
 	private final byte[] privateKey; // a
 	@Getter
 	private byte[] publicKey; // A
@@ -30,6 +37,8 @@ public final class DeviceSession extends SrpSession {
 	private byte[] M1;
 	private String username;
 	private byte[] pw;
+	
+	private KeyPair edKeyPair;
 
 	// For tests only 
 	public DeviceSession(Group group, byte[] testKey, String username, String password) {
@@ -39,14 +48,15 @@ public final class DeviceSession extends SrpSession {
 		pw = hash(username, ":", password);
 	}
 
-	public DeviceSession(String setupCode) {
+	public DeviceSession(String setupCode, String deviceId) {
+		this.deviceId= deviceId;
 		this.username = IDENTIFIER;
 		privateKey = generate(KEY_LENGTH);
 		publicKey = SrpCalculation.generateClientPublic(Group.G_3072_BIT, privateKey);
 		pw = hash(username, ":", setupCode);
 	}
 	
-	public byte[] respond(SrpPublicKey externalKey, Salt salt) {
+	public byte[] respond(PublicKey externalKey, Salt salt) {
 		externalPubKey = externalKey.getKey();
 		this.salt = salt.getSalt();
 		byte[] x = hash(this.salt, pw);
@@ -65,7 +75,7 @@ public final class DeviceSession extends SrpSession {
 	
 
 	private byte[] calculateM() {
-		byte[] hN = hash(SrpCalculation.trimBigInt(GROUP.getN()));
+		byte[] hN = hash(GROUP.getNAsArr());
 		byte[] hG = hash(GROUP.getGAsArr());
 		byte[] xorResult = xor(hN, hG);
 		byte[] K = hash(secret);
@@ -73,15 +83,15 @@ public final class DeviceSession extends SrpSession {
 		
 		byte[] M = hash(xorResult, hU, salt, publicKey, externalPubKey, K);
 		return M;
-		
 	}
 
 
-	public void verify(byte[] data) {
-		byte[] M2 = hash(publicKey, M1, hash(secret));
-		if (!Arrays.equals(data,M2)) {
-			log.error("Not valid result evidance message");
+	public boolean verify(byte[] data) {
+		boolean result = Arrays.equals(data, hash(publicKey, M1, hash(secret)));
+		if (result) {
+			generateEd25519Keys();
 		}
+		return result;
 	}
 	
 	private byte[] xor(byte[] b1, byte[] b2) {
@@ -90,6 +100,27 @@ public final class DeviceSession extends SrpSession {
 			result[i] = (byte) (b1[i] ^ b2[i]);
 		}
 		return result;
+	}
+
+	//FIXME: replace by correct using of session
+	public byte[] getSharedSessionKey() {
+		return hash(secret);
+	}
+	
+	public byte[] getDeviceLTPK() {
+		return edKeyPair.getPublicKey();
+	}
+	
+	public byte[] getDeviceLTSK() {
+		return edKeyPair.getPrivateKey();
+	}
+	
+	private void generateEd25519Keys() {
+		try {
+			edKeyPair = KeyPair.newKeyPair();
+		} catch (GeneralSecurityException e) {
+			log.error("Key pair was not generated:", e);
+		}
 	}
 	
 }

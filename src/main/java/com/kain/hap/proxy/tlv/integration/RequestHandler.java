@@ -23,6 +23,7 @@ public class RequestHandler implements GenericHandler<HapRequest>{
 	public Object handle(HapRequest payload, MessageHeaders headers) {
 		log.debug("Here is packet: {}", payload);
 		StateContext context = StateContext.builder()
+				.endpoint(payload.getEndpoint())
 				.state(payload.getBody().getState())
 				.deviceId(Optional.ofNullable(headers.get("ip_connectionId"))
 						.map(Object::toString)

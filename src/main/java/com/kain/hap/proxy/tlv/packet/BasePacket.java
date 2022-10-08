@@ -7,6 +7,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public abstract class BasePacket {
+public abstract class BasePacket extends Packet{
 	private final State state;
 }

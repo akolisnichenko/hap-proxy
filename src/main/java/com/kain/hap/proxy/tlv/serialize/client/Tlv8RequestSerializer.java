@@ -15,8 +15,7 @@ public class Tlv8RequestSerializer implements Serializer<HapRequest>{
 	private static final TlvMapper MAPPER = TlvMapper.INSTANCE;
 	private static final byte[] CRLF = "\r\n".getBytes();
 	private static final byte[] COLON = ":".getBytes();
-	//TODO: replace by correct endpoint from request  
-	private static final byte[] REQUEST_HEAD = "POST /pair-setup HTTP/1.1".getBytes();
+	private static final String REQUEST_HEAD_TEMPLATE = "POST %s HTTP/1.1";
 	private static final byte[] LENGTH_HEADER = "Content-Length".getBytes();
 
 	@Override
@@ -27,11 +26,10 @@ public class Tlv8RequestSerializer implements Serializer<HapRequest>{
 				.map(e -> Bytes.concat(e.getKey().getBytes(), COLON, e.getValue().getBytes(), CRLF))
 				.reduce(new byte[0], Bytes::concat);
 
-
-		byte[] raw = Bytes.concat(REQUEST_HEAD, CRLF);
+		byte[] requestHead = REQUEST_HEAD_TEMPLATE.formatted(request.getEndpoint()).getBytes();
+		byte[] raw = Bytes.concat(requestHead, CRLF);
 		raw = Bytes.concat(raw, headers,  LENGTH_HEADER, COLON, String.valueOf(body.length).getBytes(), CRLF);
 		raw = Bytes.concat(raw, CRLF, body);
-
 		outputStream.write(raw);
 	}
 

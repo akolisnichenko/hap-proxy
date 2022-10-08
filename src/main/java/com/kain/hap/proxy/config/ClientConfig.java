@@ -12,6 +12,7 @@ import org.springframework.integration.ip.dsl.Tcp;
 import org.springframework.messaging.MessageChannel;
 
 import com.kain.hap.proxy.tlv.integration.ResponseHandler;
+import com.kain.hap.proxy.tlv.integration.ResponseTransformer;
 import com.kain.hap.proxy.tlv.serialize.client.Tlv8RequestSerializer;
 import com.kain.hap.proxy.tlv.serialize.client.Tlv8ResponseDeserializer;
 
@@ -27,6 +28,8 @@ public class ClientConfig {
 	
 	@Autowired
 	private ResponseHandler responseHandler;
+	@Autowired
+	private ResponseTransformer responseTransformer;
 
 	@Bean
 	public MessageChannel outcome() {
@@ -37,34 +40,6 @@ public class ClientConfig {
 	public MessageChannel response() {
 		return MessageChannels.direct().get();
 	}
-/*	
-	@Bean
-	public TcpNetClientConnectionFactory cf() {
-		TcpNetClientConnectionFactory cf = new TcpNetClientConnectionFactory(realAccessoryHost, realAccessoryPort);
-		cf.setSingleUse(false);
-		cf.setDeserializer(new Tlv8ResponseDeserializer());
-		cf.setSerializer(new Tlv8RequestSerializer());
-		cf.setSoTimeout(10000);
-		return cf;
-	}
-
-	
-	@Bean
-	@ServiceActivator(inputChannel = "device")
-	public TcpOutboundGateway deviceGateway() {
-		TcpOutboundGateway outGate = new TcpOutboundGateway();
-		outGate.setConnectionFactory(cf());
-		outGate.setOutputChannel(response());
-		outGate.setRemoteTimeout(20000);
-		return outGate;
-	}
-
-	@Bean
-	public IntegrationFlow mainCommunicationFlow() {
-		return IntegrationFlows.from(outcome()).channel("device").get();
-	}
-*/
-
 	
 	@Bean
 	public IntegrationFlow device() {
@@ -76,6 +51,7 @@ public class ClientConfig {
 							.deserializer(new Tlv8ResponseDeserializer())
 							.serializer(new Tlv8RequestSerializer())
 							.singleUseConnections(false)
+							
 							)
 						)
 				.channel(response())
@@ -86,6 +62,7 @@ public class ClientConfig {
 	public IntegrationFlow accessoryResResponseHandler() {
 		return IntegrationFlows.from(response())
 				.handle(responseHandler)
+				.transform(responseTransformer)
 				.channel(outcome())
 				.get();
 	}

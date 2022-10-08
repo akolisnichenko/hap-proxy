@@ -11,6 +11,6 @@ public class EncryptedStep implements BehaviourState{
 
 	@Override
 	public BasePacket handle(StateContext context) {
-		return new MethodPacket(State.M3, Method.PAIR_SETUP);
+		return new MethodPacket(State.M5, Method.PAIR_SETUP);
 	}
 }

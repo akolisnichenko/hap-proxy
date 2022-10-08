@@ -1,5 +1,7 @@
 package com.kain.hap.proxy.state;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 
 import com.kain.hap.proxy.tlv.packet.BasePacket;
@@ -15,7 +17,9 @@ public class AccessoryStateService implements StateService{
 
 	@Override
 	public BasePacket onNext(StateContext context) {
-		return map.getNextStep(context.getState()).handle(context);
+		return Optional.ofNullable(map.getNextStep(context))
+		.map(s -> s.handle(context))
+		.orElse(null);
 	}
 
 }
