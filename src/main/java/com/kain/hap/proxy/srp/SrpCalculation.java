@@ -1,4 +1,4 @@
-package com.kain.hap.proxy.service;
+package com.kain.hap.proxy.srp;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 import com.google.common.hash.Hashing;
 import com.google.common.primitives.Bytes;
-import com.kain.hap.proxy.srp.Group;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -49,12 +48,10 @@ public class SrpCalculation {
 	}
 
 	public static byte[] hash(String... args) {
-		//return Hashing.sha1().hashString(String.join("", args), StandardCharsets.UTF_8).asBytes();
 		return Hashing.sha512().hashString(String.join("", args), StandardCharsets.UTF_8).asBytes();
 	}
 
 	public static byte[] hash(byte[]... args) {
-		//return Hashing.sha1().hashBytes(Bytes.concat(args)).asBytes();
 		return Hashing.sha512().hashBytes(Bytes.concat(args)).asBytes();
 	}
 

@@ -16,13 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class PacketHandler implements GenericHandler<HapRequest>{
+public class RequestHandler implements GenericHandler<HapRequest>{
 	private final AccessoryStateService stateService;
 
 	@Override
 	public Object handle(HapRequest payload, MessageHeaders headers) {
 		log.debug("Here is packet: {}", payload);
 		StateContext context = StateContext.builder()
+				.endpoint(payload.getEndpoint())
 				.state(payload.getBody().getState())
 				.deviceId(Optional.ofNullable(headers.get("ip_connectionId"))
 						.map(Object::toString)

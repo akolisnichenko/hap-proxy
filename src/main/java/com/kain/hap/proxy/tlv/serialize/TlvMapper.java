@@ -3,9 +3,12 @@ package com.kain.hap.proxy.tlv.serialize;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Method;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TlvMapper {
 	
 	private final TypeSerializer typeSerializer = new TypeSerializer();

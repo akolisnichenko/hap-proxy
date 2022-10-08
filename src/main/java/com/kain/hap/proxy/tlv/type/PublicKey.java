@@ -5,6 +5,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public class SrpPublicKey {
+public class PublicKey {
 	private final byte[] key;
 }
