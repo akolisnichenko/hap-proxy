@@ -8,8 +8,8 @@ import com.google.common.primitives.Bytes;
 public class HKDF {
 	// sha512 - 64 octets(bytes)
 	@FunctionalInterface
-	public interface Function<One, Two, Three> {
-		public Three apply(One one, Two two);
+	public interface Function<S, V, K> {
+		public K apply(S salt, V value);
 	}
 
 	private byte[] prk;

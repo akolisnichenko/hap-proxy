@@ -19,13 +19,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ResponseHandler implements GenericHandler<HapResponse>{
 	private final AccessoryStateService stateService;
+	//TODO: add logic for response to get endpoint 
 
 	@Override
 	public Object handle(HapResponse payload, MessageHeaders headers) {
 		//TODO: remove transformation into separate class
 		log.debug("Here is response: {}", payload.getCode());
 		StateContext context = StateContext.builder()
-				.endpoint(null)
+				.endpoint("/pair-setup")
 				.state(payload.getBody().getState())
 				.deviceId(Optional.ofNullable(headers.get("ip_connectionId"))
 						.map(Object::toString)

@@ -41,6 +41,7 @@ public class AdminToolController {
 	@ResponseStatus(code = HttpStatus.OK)
 	public void startDevicePacket() {
 		HapRequest initialRequest = new HapRequest();
+		initialRequest.setEndpoint("/pair-setup");
 		initialRequest.addHeader("Host:" + realAccessoryHost + ":" + realAccessoryPort + CRLF);
 		initialRequest.setBody(new MethodPacket(State.M1, Method.PAIR_SETUP));
 		outcome.send(MessageBuilder.withPayload(initialRequest).build());

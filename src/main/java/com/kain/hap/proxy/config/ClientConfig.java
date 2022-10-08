@@ -51,7 +51,6 @@ public class ClientConfig {
 							.deserializer(new Tlv8ResponseDeserializer())
 							.serializer(new Tlv8RequestSerializer())
 							.singleUseConnections(false)
-							
 							)
 						)
 				.channel(response())

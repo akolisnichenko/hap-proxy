@@ -46,8 +46,8 @@ public class BehaviourMap {
 		
 		routingMap = Maps.newHashMap();
 		
-		routingMap.put("pair-setup", setupSteps);
-		routingMap.put("pair-verify", verifySteps);
+		routingMap.put("/pair-setup", setupSteps);
+		routingMap.put("/pair-verify", verifySteps);
 		
 	}
 	

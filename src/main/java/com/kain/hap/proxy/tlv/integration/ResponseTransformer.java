@@ -21,6 +21,9 @@ public class ResponseTransformer implements GenericTransformer<BasePacket, HapRe
 		HapRequest request = new HapRequest();
 		request.addHeader("Host:" + realAccessoryHost + ":" + realAccessoryPort + CRLF);
 		request.setBody(source);
+		//TODO: replace by value from packet
+		request.setEndpoint("/pair-setup");
+		
 		return request;
 	}
 
