@@ -7,9 +7,9 @@ import java.util.Map;
 import org.springframework.core.serializer.Serializer;
 
 import com.google.common.primitives.Bytes;
-import com.kain.hap.proxy.tlv.packet.BasePacket;
+import com.kain.hap.proxy.tlv.packet.Packet;
 
-public class BasePacketSerializer implements Serializer<BasePacket>{
+public class BasePacketSerializer implements Serializer<Packet>{
 	private static final TlvMapper MAPPER = TlvMapper.INSTANCE;
 	private static final byte[] CRLF = "\r\n".getBytes();
 	private static final byte[] COLON = ":".getBytes();
@@ -17,7 +17,7 @@ public class BasePacketSerializer implements Serializer<BasePacket>{
 	private static final byte[] LENGTH_HEADER = "Content-Length".getBytes();
 
 	@Override
-	public void serialize(BasePacket packet, OutputStream outputStream) throws IOException {
+	public void serialize(Packet packet, OutputStream outputStream) throws IOException {
 		byte[] body = MAPPER.writeValue(packet);
 		byte[] headers = Map.of("Content-Type", "application/pairing+tlv8")
 				.entrySet()

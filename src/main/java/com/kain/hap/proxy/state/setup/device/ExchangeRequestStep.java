@@ -14,11 +14,7 @@ import com.kain.hap.proxy.state.BehaviourState;
 import com.kain.hap.proxy.state.StateContext;
 import com.kain.hap.proxy.tlv.ErrorCode;
 import com.kain.hap.proxy.tlv.State;
-import com.kain.hap.proxy.tlv.packet.BasePacket;
-import com.kain.hap.proxy.tlv.packet.DataPacket;
-import com.kain.hap.proxy.tlv.packet.EncryptedPacket;
-import com.kain.hap.proxy.tlv.packet.ErrorPacket;
-import com.kain.hap.proxy.tlv.packet.ProofPacket;
+import com.kain.hap.proxy.tlv.packet.Packet;
 import com.kain.hap.proxy.tlv.serialize.TlvMapper;
 import com.kain.hap.proxy.tlv.type.Encrypted;
 import com.kain.hap.proxy.tlv.type.Identifier;
@@ -34,11 +30,14 @@ public class ExchangeRequestStep implements BehaviourState {
 	private final SessionRegistrationService sessionService;
 
 	@Override
-	public BasePacket handle(StateContext context) {
+	public Packet handle(StateContext context) {
 		DeviceSession session = sessionService.getDeviceSession(context.getDeviceId());
-		ProofPacket income = (ProofPacket) context.getIncome();
-		if (!session.verify(income.getProof().getProof())) {
-			return new ErrorPacket(State.M5, ErrorCode.AUTHENTICATION);
+		
+		if (!session.verify(context.getIncome().getProof().getProof())) {
+			return Packet.builder()
+					.state(State.M5)
+					.error(ErrorCode.AUTHENTICATION)
+					.build();
 		}
 
 		HKDF hkdf = new HKDF(Hash::hmacSha512);
@@ -51,18 +50,25 @@ public class ExchangeRequestStep implements BehaviourState {
 			Ed25519Sign sign = new Ed25519Sign(session.getDeviceLTSK());
 			byte[] iOSDeviceSignature = sign.sign(iOSDeviceInfo);
 
-			DataPacket subTlv = new DataPacket(new Identifier(deviceId),
-					new PublicKey(session.getDeviceLTPK()), new Signature(iOSDeviceSignature));
+			Packet subTlv = Packet.builder().id(new Identifier(deviceId))
+					.key(new PublicKey(session.getDeviceLTPK()))
+					.signature(new Signature(iOSDeviceSignature))
+					.build();
 			byte[] subTlvData = TlvMapper.INSTANCE.writeValue(subTlv);
 			
 			hkdf.extract("Pair-Setup-Encrypt-Salt".getBytes(), session.getSharedSessionKey());
 			byte[] encryptKey = hkdf.expand("Pair-Setup-Encrypt-Info".getBytes(), 32);
 			AEADResult outResult = ChaCha20.aead(encryptKey, "PS-Msg05".getBytes(), subTlvData, new byte[0]);
-			return new EncryptedPacket(State.M5, new Encrypted(outResult.getConcatenated()));
+			return Packet.builder().state(State.M5)
+					.encrypted(new Encrypted(outResult.getConcatenated()))
+					.build();
 
 		} catch (GeneralSecurityException e) {
 			log.error("Couldn't sign data", e);
 		}
-		return new ErrorPacket(State.M5, ErrorCode.UNAVAILABLE);
+		return Packet.builder()
+				.state(State.M5)
+				.error(ErrorCode.UNAVAILABLE)
+				.build();
 	}
 }

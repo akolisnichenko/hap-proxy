@@ -66,7 +66,7 @@ public class HttpPacketDeserializer implements Deserializer<HapRequest>, Applica
 					}
 					// get request method and endpoint
 					if (header.endsWith(METHOD_SUFIX)) {
-						String[] splited = header.split(" ", 2);
+						String[] splited = header.split(" ");
 						request.setMethod(splited[0]);
 						request.setEndpoint(splited[1]);
 					} else {

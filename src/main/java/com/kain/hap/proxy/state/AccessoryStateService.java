@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.kain.hap.proxy.tlv.packet.BasePacket;
+import com.kain.hap.proxy.tlv.packet.Packet;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +16,7 @@ public class AccessoryStateService implements StateService{
 	
 
 	@Override
-	public BasePacket onNext(StateContext context) {
+	public Packet onNext(StateContext context) {
 		return Optional.ofNullable(map.getNextStep(context))
 		.map(s -> s.handle(context))
 		.orElse(null);

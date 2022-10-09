@@ -69,4 +69,10 @@ public class SessionRegistrationService {
 		}
 		connectedAccessoryKeys.put(accessoryUUID, keyPair);
 	}
+
+	public byte[] getLongTermSecretKey(String accessoryIdentifier) {
+		UUID sessionAccId = UUID.nameUUIDFromBytes(accessoryIdentifier.getBytes());
+		return connectedAccessoryKeys.get(sessionAccId).getPrivateKey();
+		
+	}
 }

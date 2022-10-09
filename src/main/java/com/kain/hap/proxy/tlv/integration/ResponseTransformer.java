@@ -4,11 +4,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.transformer.GenericTransformer;
 import org.springframework.stereotype.Component;
 
-import com.kain.hap.proxy.tlv.packet.BasePacket;
 import com.kain.hap.proxy.tlv.packet.HapRequest;
+import com.kain.hap.proxy.tlv.packet.Packet;
 
 @Component
-public class ResponseTransformer implements GenericTransformer<BasePacket, HapRequest>{
+public class ResponseTransformer implements GenericTransformer<Packet, HapRequest>{
 	@Value("${real.accessory.host:localhost}")
 	private String realAccessoryHost;
 	@Value("${real.accessory.port}")
@@ -17,7 +17,7 @@ public class ResponseTransformer implements GenericTransformer<BasePacket, HapRe
 	private static final String CRLF = "\r\n";
 
 	@Override
-	public HapRequest transform(BasePacket source) {
+	public HapRequest transform(Packet source) {
 		HapRequest request = new HapRequest();
 		request.addHeader("Host:" + realAccessoryHost + ":" + realAccessoryPort + CRLF);
 		request.setBody(source);

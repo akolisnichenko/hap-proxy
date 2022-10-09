@@ -28,8 +28,12 @@ public class TlvMapper {
 		}
 		for (Method m : clazz.getDeclaredMethods()) {
 			try {
-				if (m.canAccess(value) && m.getName().startsWith("get")) {
-					stream.write(typeSerializer.serialize(m.invoke(value)));
+				// use only getters
+				if (m.getName().startsWith("get") && m.canAccess(value)) {
+					Object fieldValue = m.invoke(value); 
+					if (fieldValue != null) {
+						stream.write(typeSerializer.serialize(fieldValue));
+					}
 				}
 			}
 			catch(Exception ex) {

@@ -17,10 +17,7 @@ import com.kain.hap.proxy.state.BehaviourState;
 import com.kain.hap.proxy.state.StateContext;
 import com.kain.hap.proxy.tlv.ErrorCode;
 import com.kain.hap.proxy.tlv.State;
-import com.kain.hap.proxy.tlv.packet.BasePacket;
-import com.kain.hap.proxy.tlv.packet.DataPacket;
-import com.kain.hap.proxy.tlv.packet.EncryptedPacket;
-import com.kain.hap.proxy.tlv.packet.ErrorPacket;
+import com.kain.hap.proxy.tlv.packet.Packet;
 import com.kain.hap.proxy.tlv.serialize.TlvMapper;
 import com.kain.hap.proxy.tlv.type.Encrypted;
 import com.kain.hap.proxy.tlv.type.Identifier;
@@ -36,19 +33,19 @@ public class ExchangeResponseStep implements BehaviourState {
 	private final SessionRegistrationService sessionService;
 
 	@Override
-	public BasePacket handle(StateContext context) {
+	public Packet handle(StateContext context) {
 		AccessorySession session = sessionService.getSession(context.getDeviceId());
 		HKDF hkdf = new HKDF(Hash::hmacSha512);
 		hkdf.extract("Pair-Setup-Encrypt-Salt".getBytes(), session.getSharedSessionKey());
 		byte[] inKey = hkdf.expand("Pair-Setup-Encrypt-Info".getBytes(), 32);
-		EncryptedPacket encrypted = (EncryptedPacket) context.getIncome();
+		Packet packet = context.getIncome();
 
-		byte[] data = encrypted.getData().getArray();
+		byte[] data = packet.getEncrypted().getArray();
 		try {
 			byte[] res = ChaCha20.decode(inKey, "PS-Msg05".getBytes(), new AEADResult(data), new byte[0]);
-			DataPacket dataPacket = (DataPacket) TlvMapper.INSTANCE.readPacket(res);
+			Packet dataPacket = TlvMapper.INSTANCE.readPacket(res);
 
-			byte[] iosDevicePairingId = dataPacket.getIdentifier().getId();
+			byte[] iosDevicePairingId = dataPacket.getId().getId();
 			byte[] iosDeviceLTPK = dataPacket.getKey().getKey(); // long-term public key
 			byte[] iosDeviceSignature = dataPacket.getSignature().getValue();
 
@@ -62,7 +59,10 @@ public class ExchangeResponseStep implements BehaviourState {
 				Ed25519Verify verify = new Ed25519Verify(iosDeviceLTPK);
 				verify.verify(iosDeviceSignature, iOSDeviceInfo);
 			} catch (GeneralSecurityException e) {
-				return new ErrorPacket(State.M6, ErrorCode.AUTHENTICATION);
+				return Packet.builder()
+						.state(State.M6)
+						.error(ErrorCode.AUTHENTICATION)
+						.build();
 			}
 
 			try {
@@ -71,7 +71,10 @@ public class ExchangeResponseStep implements BehaviourState {
 			}
 
 			catch (MaxPeersException ex) {
-				return new ErrorPacket(State.M6, ErrorCode.MAX_PEERS);
+				return Packet.builder()
+						.state(State.M6)
+						.error(ErrorCode.MAX_PEERS)
+						.build();
 			}
 
 			hkdf.extract("Pair-Setup-Accessory-Sign-Salt".getBytes(), session.getSharedSessionKey());
@@ -85,18 +88,30 @@ public class ExchangeResponseStep implements BehaviourState {
 				byte[] accessoryInfo = Bytes.concat(outKey, accessoryId, keyPair.getPublicKey());
 				Ed25519Sign signer = new Ed25519Sign(keyPair.getPrivateKey());
 				byte[] accessorySign = signer.sign(accessoryInfo);
-				DataPacket outSubPacket = new DataPacket(new Identifier(accessoryId),
-						new PublicKey(keyPair.getPublicKey()), new Signature(accessorySign));
+				Packet outSubPacket = Packet.builder()
+						.id(new Identifier(accessoryId))
+						.key(new PublicKey(keyPair.getPublicKey()))
+						.signature(new Signature(accessorySign)).build();
 				byte[] outData = TlvMapper.INSTANCE.writeValue(outSubPacket);
 				AEADResult outResult = ChaCha20.aead(inKey, "PS-Msg06".getBytes(), outData, new byte[0]);
-				return new EncryptedPacket(State.M6, new Encrypted(outResult.getConcatenated()));
+				return Packet.builder()
+						.state(State.M6)
+						.encrypted(new Encrypted(outResult.getConcatenated()))
+						.build();
 			} catch (GeneralSecurityException e) {
-				return new ErrorPacket(State.M6, ErrorCode.AUTHENTICATION);
+				return Packet.builder()
+						.state(State.M6)
+						.error(ErrorCode.AUTHENTICATION)
+						.build();
 			}
 
 		} catch (Exception e) {
 			log.error("Invalid exchange step", e);
-			return new ErrorPacket(State.M6, ErrorCode.AUTHENTICATION);
+			//TODO: replace by one instance of error packet
+			return Packet.builder()
+					.state(State.M6)
+					.error(ErrorCode.AUTHENTICATION)
+					.build();
 		}
 	}
 

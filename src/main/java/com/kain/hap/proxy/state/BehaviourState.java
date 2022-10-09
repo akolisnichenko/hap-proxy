@@ -1,9 +1,8 @@
 package com.kain.hap.proxy.state;
 
-import com.kain.hap.proxy.tlv.packet.BasePacket;
+import com.kain.hap.proxy.tlv.packet.Packet;
 
 public interface BehaviourState {
-	
-	BasePacket handle(StateContext context);
+	Packet handle(StateContext context);
 
 }

@@ -1,9 +1,9 @@
 package com.kain.hap.proxy.state;
 
-import com.kain.hap.proxy.tlv.packet.BasePacket;
+import com.kain.hap.proxy.tlv.packet.Packet;
 
 public interface StateService {
 	
-	BasePacket onNext(StateContext incomePacket);
+	Packet onNext(StateContext incomePacket);
 
 }

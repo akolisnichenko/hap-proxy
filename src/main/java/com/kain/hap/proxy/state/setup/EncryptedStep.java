@@ -4,13 +4,12 @@ import com.kain.hap.proxy.state.BehaviourState;
 import com.kain.hap.proxy.state.StateContext;
 import com.kain.hap.proxy.tlv.Method;
 import com.kain.hap.proxy.tlv.State;
-import com.kain.hap.proxy.tlv.packet.BasePacket;
-import com.kain.hap.proxy.tlv.packet.MethodPacket;
+import com.kain.hap.proxy.tlv.packet.Packet;
 
 public class EncryptedStep implements BehaviourState{
 
 	@Override
-	public BasePacket handle(StateContext context) {
-		return new MethodPacket(State.M5, Method.PAIR_SETUP);
+	public Packet handle(StateContext context) {
+		return Packet.builder().state(State.M5).method(Method.PAIR_SETUP).build();
 	}
 }

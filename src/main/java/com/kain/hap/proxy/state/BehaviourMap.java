@@ -16,6 +16,8 @@ import com.kain.hap.proxy.state.setup.accessory.SaltStep;
 import com.kain.hap.proxy.state.setup.device.DeviceProofStep;
 import com.kain.hap.proxy.state.setup.device.ExchangeRequestStep;
 import com.kain.hap.proxy.state.setup.device.InitialStep;
+import com.kain.hap.proxy.state.verify.accessory.VerifyStartRersponseStep;
+import com.kain.hap.proxy.state.verify.device.VerifyStartRequestStep;
 import com.kain.hap.proxy.tlv.State;
 
 @Component
@@ -43,6 +45,11 @@ public class BehaviourMap {
 		setupSteps.put(State.M4, new ExchangeRequestStep(sessionService));
 		
 		Map<State, BehaviourState> verifySteps = Maps.newHashMap();
+		// accessory
+		verifySteps.put(State.M1, new VerifyStartRersponseStep(sessionService));
+		
+		//
+		verifySteps.put(null, new VerifyStartRequestStep(sessionService));
 		
 		routingMap = Maps.newHashMap();
 		
@@ -53,7 +60,7 @@ public class BehaviourMap {
 	
 	public BehaviourState getNextStep(StateContext context) {
 		return routingMap.getOrDefault(context.getEndpoint(), Collections.emptyMap())
-				.get(context.getState());
+				.get(context.getIncome().getState());
 	}
 	
 

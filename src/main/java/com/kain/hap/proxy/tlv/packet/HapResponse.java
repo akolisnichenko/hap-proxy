@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class HapResponse {
 	private String code;
 	private Map<String, String> headers = Maps.newHashMap();
-	private BasePacket body;
+	private Packet body;
 
 	public void addHeader(String rawString) {
 		String[] splittedHeader = rawString.split(":", 2);

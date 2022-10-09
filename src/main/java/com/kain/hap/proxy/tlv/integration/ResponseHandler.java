@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import com.kain.hap.proxy.state.AccessoryStateService;
 import com.kain.hap.proxy.state.StateContext;
-import com.kain.hap.proxy.tlv.packet.ErrorPacket;
 import com.kain.hap.proxy.tlv.packet.HapResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -27,14 +26,13 @@ public class ResponseHandler implements GenericHandler<HapResponse>{
 		log.debug("Here is response: {}", payload.getCode());
 		StateContext context = StateContext.builder()
 				.endpoint("/pair-setup")
-				.state(payload.getBody().getState())
 				.deviceId(Optional.ofNullable(headers.get("ip_connectionId"))
 						.map(Object::toString)
 						.orElse(null))
 				.income(payload.getBody())
 				.build(); 
-		if (payload.getBody() instanceof ErrorPacket packet) {
-			log.error("Got HAP Error: {}", packet.getError());
+		if (payload.getBody().getError() != null) {
+			log.error("Got HAP Error: {}", payload.getBody().getError());
 			return null;
 		}
 		return stateService.onNext(context);

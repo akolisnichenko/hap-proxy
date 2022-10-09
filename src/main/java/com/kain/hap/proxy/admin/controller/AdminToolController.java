@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kain.hap.proxy.tlv.Method;
 import com.kain.hap.proxy.tlv.State;
 import com.kain.hap.proxy.tlv.packet.HapRequest;
-import com.kain.hap.proxy.tlv.packet.MethodPacket;
+import com.kain.hap.proxy.tlv.packet.Packet;
 
 import lombok.RequiredArgsConstructor;
 
@@ -43,7 +43,7 @@ public class AdminToolController {
 		HapRequest initialRequest = new HapRequest();
 		initialRequest.setEndpoint("/pair-setup");
 		initialRequest.addHeader("Host:" + realAccessoryHost + ":" + realAccessoryPort + CRLF);
-		initialRequest.setBody(new MethodPacket(State.M1, Method.PAIR_SETUP));
+		initialRequest.setBody(Packet.builder().state(State.M1).method(Method.PAIR_SETUP).build());
 		outcome.send(MessageBuilder.withPayload(initialRequest).build());
 	
 	}
