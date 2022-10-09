@@ -25,7 +25,7 @@ public class ResponseHandler implements GenericHandler<HapResponse>{
 		//TODO: remove transformation into separate class
 		log.debug("Here is response: {}", payload.getCode());
 		StateContext context = StateContext.builder()
-				.endpoint("/pair-setup")
+				.endpoint("/pair-setup") // TODO: fix ASAP
 				.deviceId(Optional.ofNullable(headers.get("ip_connectionId"))
 						.map(Object::toString)
 						.orElse(null))

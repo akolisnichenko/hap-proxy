@@ -8,10 +8,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kain.hap.proxy.crypto.Curve25519Tool;
+import com.kain.hap.proxy.crypto.KeyPair;
 import com.kain.hap.proxy.tlv.Method;
 import com.kain.hap.proxy.tlv.State;
 import com.kain.hap.proxy.tlv.packet.HapRequest;
 import com.kain.hap.proxy.tlv.packet.Packet;
+import com.kain.hap.proxy.tlv.type.PublicKey;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,13 +40,30 @@ public class AdminToolController {
 	private static final String CRLF = "\r\n";
 
 	
-	@GetMapping("/hap/device/M1")
+	@GetMapping("/hap/device/setup/M1")
 	@ResponseStatus(code = HttpStatus.OK)
-	public void startDevicePacket() {
+	public void startSetupPacket() {
 		HapRequest initialRequest = new HapRequest();
 		initialRequest.setEndpoint("/pair-setup");
 		initialRequest.addHeader("Host:" + realAccessoryHost + ":" + realAccessoryPort + CRLF);
 		initialRequest.setBody(Packet.builder().state(State.M1).method(Method.PAIR_SETUP).build());
+		outcome.send(MessageBuilder.withPayload(initialRequest).build());
+	
+	}
+	
+	@GetMapping("/hap/device/verify/M1")
+	@ResponseStatus(code = HttpStatus.OK)
+	public void startVerifyPacket() {
+		KeyPair pair = Curve25519Tool.generateKeys();
+		Packet initial = Packet.builder()
+				.state(State.M1)
+				.key(new PublicKey(pair.getPubKey()))
+				.build();
+		
+		HapRequest initialRequest = new HapRequest();
+		initialRequest.setEndpoint("/pair-verify");
+		initialRequest.addHeader("Host:" + realAccessoryHost + ":" + realAccessoryPort + CRLF);
+		initialRequest.setBody(initial);
 		outcome.send(MessageBuilder.withPayload(initialRequest).build());
 	
 	}

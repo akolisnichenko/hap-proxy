@@ -80,9 +80,7 @@ public final class DeviceSession extends SrpSession {
 		byte[] xorResult = xor(hN, hG);
 		byte[] K = hash(secret);
 		byte[] hU = hash(username);
-		
-		byte[] M = hash(xorResult, hU, salt, publicKey, externalPubKey, K);
-		return M;
+		return hash(xorResult, hU, salt, publicKey, externalPubKey, K);
 	}
 
 
