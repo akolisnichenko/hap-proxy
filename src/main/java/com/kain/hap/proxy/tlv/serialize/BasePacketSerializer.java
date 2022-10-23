@@ -10,7 +10,6 @@ import com.google.common.primitives.Bytes;
 import com.kain.hap.proxy.tlv.packet.Packet;
 
 public class BasePacketSerializer implements Serializer<Packet>{
-	private static final TlvMapper MAPPER = TlvMapper.INSTANCE;
 	private static final byte[] CRLF = "\r\n".getBytes();
 	private static final byte[] COLON = ":".getBytes();
 	private static final byte[] RESPONSE_CODE = "HTTP/1.1 200 OK".getBytes();
@@ -18,7 +17,7 @@ public class BasePacketSerializer implements Serializer<Packet>{
 
 	@Override
 	public void serialize(Packet packet, OutputStream outputStream) throws IOException {
-		byte[] body = MAPPER.writeValue(packet);
+		byte[] body = TlvMapper.writeValue(packet);
 		byte[] headers = Map.of("Content-Type", "application/pairing+tlv8")
 				.entrySet()
 				.stream()

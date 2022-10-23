@@ -9,7 +9,5 @@ import lombok.Data;
 @Data
 public class StateContext {
 	private String endpoint;
-	private String deviceId;
 	private Packet income;
-	
 }

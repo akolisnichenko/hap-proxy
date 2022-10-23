@@ -1,6 +1,6 @@
 package com.kain.hap.proxy.state.setup;
 
-import com.kain.hap.proxy.state.BehaviourState;
+import com.kain.hap.proxy.state.BehaviourStep;
 import com.kain.hap.proxy.state.StateContext;
 import com.kain.hap.proxy.tlv.ErrorCode;
 import com.kain.hap.proxy.tlv.State;
@@ -9,7 +9,7 @@ import com.kain.hap.proxy.tlv.packet.Packet;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ErrorStep implements BehaviourState{
+public class ErrorStep implements BehaviourStep{
 
 	@Override
 	public Packet handle(StateContext context) {

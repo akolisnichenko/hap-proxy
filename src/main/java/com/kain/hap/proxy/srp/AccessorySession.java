@@ -7,23 +7,20 @@ import static com.kain.hap.proxy.srp.SrpCalculation.hash;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import com.kain.hap.proxy.tlv.type.Proof;
 import com.kain.hap.proxy.tlv.type.PublicKey;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public final class AccessorySession extends SrpSession {
+public final class AccessorySession extends SrpSession implements Session{
 
 	// internal data
-	@Getter 
 	private String accessoryIdentifier;
 	@Getter
 	private final byte[] salt;
 	@Getter
 	private final byte[] privateKey; // b
-	@Getter
 	private byte[] publicKey; // B
 
 	private byte[] x;
@@ -54,7 +51,7 @@ public final class AccessorySession extends SrpSession {
 		publicKey = generateServerPublic(GROUP, verifier, privateKey);
 	}
 
-	public byte[] respond(PublicKey clientKey, Proof proof) {
+	public byte[] respond(PublicKey clientKey, byte[] proof) {
 		externalKey = clientKey.getKey();
 
 		int padLength = (GROUP.getN().bitLength() + 7) / 8;
@@ -72,10 +69,10 @@ public final class AccessorySession extends SrpSession {
 				.multiply(A).modPow(new BigInteger(1, privateKey), GROUP.getN()));
 
 		byte[] validM = calculateM();
-		if (!Arrays.equals(validM, proof.getProof())) {
+		if (!Arrays.equals(validM, proof)) {
 			log.error("Not equal proof");
 		}
-		return hash(externalKey, proof.getProof(), getSharedSessionKey());
+		return hash(externalKey, proof, getSharedSessionKey());
 	}
 
 	
@@ -96,6 +93,23 @@ public final class AccessorySession extends SrpSession {
 
 	public byte[] getSharedSessionKey() {
 		return hash(secret);
+	}
+
+	@Override
+	public PublicKey getPublicKey() {
+		return new PublicKey(publicKey);
+	}
+
+	//FIXME: move last verification step into this method
+	@Override
+	public boolean verify(byte[] data) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public byte[] getIdentifier() {
+		return accessoryIdentifier.getBytes();
 	}
 	
 }

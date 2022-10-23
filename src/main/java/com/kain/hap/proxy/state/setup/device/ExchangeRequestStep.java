@@ -8,9 +8,8 @@ import com.kain.hap.proxy.crypto.AEADResult;
 import com.kain.hap.proxy.crypto.ChaCha20;
 import com.kain.hap.proxy.crypto.HKDF;
 import com.kain.hap.proxy.crypto.Hash;
-import com.kain.hap.proxy.service.SessionRegistrationService;
-import com.kain.hap.proxy.srp.DeviceSession;
-import com.kain.hap.proxy.state.BehaviourState;
+import com.kain.hap.proxy.service.DeviceSessionService;
+import com.kain.hap.proxy.srp.Session;
 import com.kain.hap.proxy.state.StateContext;
 import com.kain.hap.proxy.tlv.ErrorCode;
 import com.kain.hap.proxy.tlv.State;
@@ -21,40 +20,44 @@ import com.kain.hap.proxy.tlv.type.Identifier;
 import com.kain.hap.proxy.tlv.type.PublicKey;
 import com.kain.hap.proxy.tlv.type.Signature;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@RequiredArgsConstructor
 @Slf4j
-public class ExchangeRequestStep implements BehaviourState {
-	private final SessionRegistrationService sessionService;
+public class ExchangeRequestStep extends BaseDeviceStep {
+
+	public ExchangeRequestStep(DeviceSessionService sessionService) {
+		super(sessionService);
+	}
 
 	@Override
 	public Packet handle(StateContext context) {
-		DeviceSession session = sessionService.getDeviceSession(context.getDeviceId());
+		Session session = getSessionService().getSession();
 		
 		if (!session.verify(context.getIncome().getProof().getProof())) {
 			return Packet.builder()
 					.state(State.M5)
 					.error(ErrorCode.AUTHENTICATION)
 					.build();
+		}else {
+			getSessionService().generateKeyPair();
 		}
 
 		HKDF hkdf = new HKDF(Hash::hmacSha512);
 		hkdf.extract("Pair-Setup-Controller-Sign-Salt".getBytes(), session.getSharedSessionKey());
 		byte[] iOSDeviceX = hkdf.expand("Pair-Setup-Controller-Sign-Info".getBytes(), 32);
-		byte[] deviceId = session.getDeviceId().getBytes();
-		byte[] iOSDeviceInfo = Bytes.concat(iOSDeviceX, deviceId, session.getDeviceLTPK());
+		byte[] deviceId = session.getIdentifier();
+		// TODO: decide where to store long term keys 
+		byte[] iOSDeviceInfo = Bytes.concat(iOSDeviceX, deviceId, getSessionService().getLTPK());
 
 		try {
-			Ed25519Sign sign = new Ed25519Sign(session.getDeviceLTSK());
+			Ed25519Sign sign = new Ed25519Sign(getSessionService().getLTSK());
 			byte[] iOSDeviceSignature = sign.sign(iOSDeviceInfo);
 
 			Packet subTlv = Packet.builder().id(new Identifier(deviceId))
-					.key(new PublicKey(session.getDeviceLTPK()))
+					.key(new PublicKey(getSessionService().getLTPK()))
 					.signature(new Signature(iOSDeviceSignature))
 					.build();
-			byte[] subTlvData = TlvMapper.INSTANCE.writeValue(subTlv);
+			byte[] subTlvData = TlvMapper.writeValue(subTlv);
 			
 			hkdf.extract("Pair-Setup-Encrypt-Salt".getBytes(), session.getSharedSessionKey());
 			byte[] encryptKey = hkdf.expand("Pair-Setup-Encrypt-Info".getBytes(), 32);

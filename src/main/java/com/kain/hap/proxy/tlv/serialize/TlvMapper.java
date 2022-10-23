@@ -11,18 +11,16 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TlvMapper {
 	
-	private final TypeSerializer typeSerializer = new TypeSerializer();
-	private final TypeDeserializer typeDesrializer = new TypeDeserializer();
+	private static final TypeSerializer typeSerializer = new TypeSerializer();
+	private static final TypeDeserializer typeDesrializer = new TypeDeserializer();
 	
-	public static final TlvMapper INSTANCE = new TlvMapper();
-	
-	public <T> byte[] writeValue(T value) {
+	public static <T> byte[] writeValue(T value) {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		addData(value.getClass(), value, stream);
 		return stream.toByteArray();
 	}
 	
-	private void addData(Class<? extends Object> clazz, Object value, ByteArrayOutputStream stream) {
+	private static void addData(Class<? extends Object> clazz, Object value, ByteArrayOutputStream stream) {
 		if (clazz.getSuperclass() != null) {
 			addData(clazz.getSuperclass(), value, stream);
 		}
@@ -42,7 +40,7 @@ public class TlvMapper {
 		}
 	}
 	
-	public <T> T readPacket(byte[] data) {
+	public static <T> T readPacket(byte[] data) {
 		return typeDesrializer.writeToObject(data);
 	}
 

@@ -24,7 +24,6 @@ public class Tlv8ResponseDeserializer implements Deserializer<HapResponse>, Appl
 	private static final int DEFAULT_MAX_MESSAGE_SIZE = 2048;
 
 	private ApplicationEventPublisher applicationEventPublisher;
-	private TlvMapper mapper = TlvMapper.INSTANCE;
 
 	@Override
 	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
@@ -57,7 +56,7 @@ public class Tlv8ResponseDeserializer implements Deserializer<HapResponse>, Appl
 						// start read body
 						byte[] body = new byte[bodyLength];
 						inputStream.read(body, 0, bodyLength);
-						response.setBody(mapper.readPacket(body));
+						response.setBody(TlvMapper.readPacket(body));
 						break;
 					}
 					duplicatedLf = true;

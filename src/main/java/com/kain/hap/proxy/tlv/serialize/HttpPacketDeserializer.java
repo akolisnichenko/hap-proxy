@@ -23,7 +23,6 @@ public class HttpPacketDeserializer implements Deserializer<HapRequest>, Applica
 	private static final int DEFAULT_MAX_MESSAGE_SIZE = 2048;
 
 	private ApplicationEventPublisher applicationEventPublisher;
-	private TlvMapper mapper = TlvMapper.INSTANCE;
 
 	@Override
 	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
@@ -56,7 +55,7 @@ public class HttpPacketDeserializer implements Deserializer<HapRequest>, Applica
 						// start read body
 						byte[] body = new byte[bodyLength];
 						inputStream.read(body, 0, bodyLength);
-						request.setBody(mapper.readPacket(body));
+						request.setBody(TlvMapper.readPacket(body));
 						break;
 					}
 					duplicatedLf = true;

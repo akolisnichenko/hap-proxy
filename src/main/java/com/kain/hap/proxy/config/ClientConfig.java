@@ -12,7 +12,6 @@ import org.springframework.integration.ip.dsl.Tcp;
 import org.springframework.messaging.MessageChannel;
 
 import com.kain.hap.proxy.tlv.integration.ResponseHandler;
-import com.kain.hap.proxy.tlv.integration.ResponseTransformer;
 import com.kain.hap.proxy.tlv.serialize.client.Tlv8RequestSerializer;
 import com.kain.hap.proxy.tlv.serialize.client.Tlv8ResponseDeserializer;
 
@@ -28,15 +27,13 @@ public class ClientConfig {
 	
 	@Autowired
 	private ResponseHandler responseHandler;
-	@Autowired
-	private ResponseTransformer responseTransformer;
 
 	@Bean
 	public MessageChannel outcome() {
 		return MessageChannels.executor(taskExecutor).get();
 	}
 	
-	@Bean
+	@Bean("responseChannel")
 	public MessageChannel response() {
 		return MessageChannels.direct().get();
 	}
@@ -61,7 +58,6 @@ public class ClientConfig {
 	public IntegrationFlow accessoryResResponseHandler() {
 		return IntegrationFlows.from(response())
 				.handle(responseHandler)
-				.transform(responseTransformer)
 				.channel(outcome())
 				.get();
 	}

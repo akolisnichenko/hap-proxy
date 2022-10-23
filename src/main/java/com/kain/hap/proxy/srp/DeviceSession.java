@@ -18,15 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 //Client
 // TODO: add stoppers to avoid repeatable call
 @Slf4j
-public final class DeviceSession extends SrpSession {
+public final class DeviceSession extends SrpSession implements Session{
 	
-	@Getter
 	private String deviceId;
 
 	// internal data 
 	@Getter
 	private final byte[] privateKey; // a
-	@Getter
 	private byte[] publicKey; // A
 	
 	
@@ -56,9 +54,9 @@ public final class DeviceSession extends SrpSession {
 		pw = hash(username, ":", setupCode);
 	}
 	
-	public byte[] respond(PublicKey externalKey, Salt salt) {
+	public byte[] respond(PublicKey externalKey, byte[] salt) {
 		externalPubKey = externalKey.getKey();
-		this.salt = salt.getSalt();
+		this.salt = salt;
 		byte[] x = hash(this.salt, pw);
 		
 		int padLength = (GROUP.getN().bitLength() + 7) / 8 ;
@@ -88,6 +86,7 @@ public final class DeviceSession extends SrpSession {
 		boolean result = Arrays.equals(data, hash(publicKey, M1, hash(secret)));
 		if (result) {
 			generateEd25519Keys();
+			log.info("Ed25519 keys were generated");
 		}
 		return result;
 	}
@@ -119,6 +118,21 @@ public final class DeviceSession extends SrpSession {
 		} catch (GeneralSecurityException e) {
 			log.error("Key pair was not generated:", e);
 		}
+	}
+
+	@Override
+	public PublicKey getPublicKey() {
+		return new PublicKey(publicKey);
+	}
+
+	@Override
+	public byte[] getIdentifier() {
+		return deviceId.getBytes();
+	}
+
+	@Override
+	public byte[] getSalt() {
+		return salt;
 	}
 	
 }

@@ -10,10 +10,10 @@ import com.kain.hap.proxy.crypto.Curve25519Tool;
 import com.kain.hap.proxy.crypto.HKDF;
 import com.kain.hap.proxy.crypto.Hash;
 import com.kain.hap.proxy.crypto.KeyPair;
-import com.kain.hap.proxy.service.SessionRegistrationService;
-import com.kain.hap.proxy.srp.AccessorySession;
-import com.kain.hap.proxy.state.BehaviourState;
+import com.kain.hap.proxy.service.AccessorySessionService;
+import com.kain.hap.proxy.srp.Session;
 import com.kain.hap.proxy.state.StateContext;
+import com.kain.hap.proxy.state.setup.accessory.BaseAccessoryStep;
 import com.kain.hap.proxy.tlv.ErrorCode;
 import com.kain.hap.proxy.tlv.State;
 import com.kain.hap.proxy.tlv.packet.Packet;
@@ -23,25 +23,27 @@ import com.kain.hap.proxy.tlv.type.Identifier;
 import com.kain.hap.proxy.tlv.type.PublicKey;
 import com.kain.hap.proxy.tlv.type.Signature;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@RequiredArgsConstructor
 @Slf4j
-public class VerifyStartRersponseStep implements BehaviourState {
-	private final SessionRegistrationService sessionService;
+public class VerifyStartRersponseStep extends BaseAccessoryStep {
+	
+
+	public VerifyStartRersponseStep(AccessorySessionService sessionService) {
+		super(sessionService);
+	}
 
 	@Override
 	public Packet handle(StateContext context) {
-		AccessorySession session = sessionService.getSession(context.getDeviceId());
+		Session session = getSessionService().getSession();
 		KeyPair pair = Curve25519Tool.generateKeys();
 		byte[] externalPubkey = context.getIncome().getKey().getKey();
 
 		byte[] sharedSecret = Curve25519Tool.generateShared(pair.getSecret(), externalPubkey);
-		byte[] accessoryInfo = Bytes.concat(pair.getPubKey(), session.getAccessoryIdentifier().getBytes(),
+		byte[] accessoryInfo = Bytes.concat(pair.getPubKey(), session.getIdentifier(),
 				externalPubkey);
 
-		byte[] ltsk = sessionService.getLongTermSecretKey(session.getAccessoryIdentifier());
+		byte[] ltsk = getSessionService().getLTSK();
 
 		try {
 			Ed25519Sign sign = new Ed25519Sign(ltsk);
@@ -49,12 +51,13 @@ public class VerifyStartRersponseStep implements BehaviourState {
 
 			Packet subTlv = Packet.builder().id(new Identifier(accessoryInfo)).signature(new Signature(signature))
 					.build();
-			byte[] outData = TlvMapper.INSTANCE.writeValue(subTlv);
+			byte[] outData = TlvMapper.writeValue(subTlv);
 
 			HKDF hkdf = new HKDF(Hash::hmacSha512);
 			hkdf.extract("Pair-Verify-Encrypt-Salt".getBytes(), sharedSecret);
-			byte[] sessionKey = hkdf.expand("Pair-Verify-Encrypt-Info".getBytes(), 32);
-			AEADResult outResult = ChaCha20.aead(sessionKey, "PV-Msg02".getBytes(), outData, new byte[0]);
+			byte[] sessionEncriptionKey = hkdf.expand("Pair-Verify-Encrypt-Info".getBytes(), 32);
+			
+			AEADResult outResult = ChaCha20.aead(sessionEncriptionKey, "PV-Msg02".getBytes(), outData, new byte[0]);
 			
 			return Packet.builder().state(State.M2).key(new PublicKey(pair.getPubKey()))
 					.encrypted(new Encrypted(outResult.getConcatenated())).build();

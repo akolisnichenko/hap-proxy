@@ -12,8 +12,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AccessoryStateService implements StateService{
 	
-	private final BehaviourMap map;
-	
+	private final AccessoryStepMap map;
 
 	@Override
 	public Packet onNext(StateContext context) {

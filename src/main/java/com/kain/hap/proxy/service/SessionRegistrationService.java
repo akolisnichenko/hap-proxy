@@ -1,11 +1,13 @@
 package com.kain.hap.proxy.service;
 
+import java.util.Deque;
 import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.crypto.tink.subtle.Ed25519Sign.KeyPair;
 import com.kain.hap.proxy.exception.MaxPeersException;
@@ -16,9 +18,12 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Deprecated
+//TODO: divide onto two separate classes for accessory and device 
 public class SessionRegistrationService {
-	private Map<String, AccessorySession> sessions = Maps.newConcurrentMap();
-	private Map<String, DeviceSession> devices = Maps.newConcurrentMap();
+	//TODO: add time to live for sessions
+	private Deque<AccessorySession> sessions = Lists.newLinkedList();
+	private Deque<DeviceSession> devices = Lists.newLinkedList();
 	@Value("${accessory.setup.code}")
 	private String setupCode;
 	@Value("${real.accessory.setup.code}")
@@ -38,25 +43,25 @@ public class SessionRegistrationService {
 	
 	
 	
-	public AccessorySession registerSession(String deviceId) {
+	public AccessorySession registerSession() {
 		AccessorySession session = new AccessorySession(setupCode, accessoryId);
-		sessions.put(deviceId, session);
+		sessions.push(session);
 		return session;
 	}
 	
-	public DeviceSession registerDevice(String deviceId) {
+	public DeviceSession registerDevice() {
 		DeviceSession session = new DeviceSession(realSetupCode, deviceIdentifier);
-		devices.put(deviceId, session);
+		devices.push( session);
 		return session;
 	}
 
 	//TODO: replace by error if not exist 
-	public AccessorySession getSession(String deviceId) {
-		return sessions.get(deviceId);
+	public AccessorySession getSession() {
+		return sessions.peek();
 	}
 	
-	public DeviceSession getDeviceSession(String deviceId) {
-		return devices.get(deviceId);
+	public DeviceSession getDeviceSession() {
+		return devices.peek();
 	}
 
 	public void registerDevicePairing(UUID iosDevicePairingUUID, byte[] iosDeviceLTPK) {
